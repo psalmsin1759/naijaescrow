@@ -17,6 +17,10 @@ This project is a microservice-based Escrow Platform where businesses can create
 
 ---
 
+##  System Design
+
+![System Design](/docs/screenshots/systemdesign.png)
+
 ##  Microservices
 
 | Service             | Description                                               |
@@ -26,6 +30,7 @@ This project is a microservice-based Escrow Platform where businesses can create
 | `payment-service`   | Generates payment links, processes payments, holds escrow |
 | `wallet-service`    | Manages wallet balances and escrow transfers              |
 | `notification-service` | Sends SMS/Email notifications to buyers and businesses |
+| `dispute-service`   | handles conflicts between buyers and businesses for orders |
 | `gateway-api`       | API gateway that routes requests to internal services     |
 
 ---
@@ -73,6 +78,7 @@ Each service emits and listens to events over **RabbitMQ**. For example:
   /payment-service
   /wallet-service
   /notification-service
+  /dispute-service
   /docs
 
 
@@ -93,8 +99,8 @@ Each service emits and listens to events over **RabbitMQ**. For example:
 
 ```bash
 
-git clone https://github.com/your-org/escrow-platform.git
-cd escrow-platform
+git clone https://github.com/psalmsin1759/naijaescrow.git
+cd naijaescrow
 
 ```
 
