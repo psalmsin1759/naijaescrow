@@ -21,7 +21,7 @@ This project is a microservice-based Escrow Platform where businesses can create
 
 ![System Design](/docs/screenshots/systemdesign.png)
 
-##  Microservices
+##  Microservices and clients
 
 | Service             | Description                                               |
 |---------------------|-----------------------------------------------------------|
@@ -32,6 +32,8 @@ This project is a microservice-based Escrow Platform where businesses can create
 | `notification-service` | Sends SMS/Email notifications to buyers and businesses |
 | `dispute-service`   | handles conflicts between buyers and businesses for orders |
 | `gateway-api`       | API gateway that routes requests to internal services     |
+| `frontend`          | Web client built with Next.js                             |
+| `mobile_app`       | Mobile client built with Flutter                           |
 
 ---
 
@@ -135,3 +137,45 @@ If a buyer cancels after payment:
 -   payment-service deducts the fee
 
 -    wallet-service processes a refund of the balance
+
+
+## Messaging
+
+  - RabbitMQ is used for inter-service event messaging
+
+  - Events: order.created, payment.successful, dispute.opened, etc.
+
+
+## Object Storage
+
+  -  Used by dispute-service to store uploaded evidence files
+
+  -  AWS S3
+
+## Frontend (Next.js)
+
+-  Located in /frontend
+
+-  Provides the web UI for users and businesses
+
+-  Integrated with api-gateway endpoints
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Mobile App (Flutter)
+
+-  Located in /mobile_app
+
+-  Targets both Android and iOS platforms
+
+-  Interacts with api-gateway via HTTPS
+
+```bash
+cd mobile_app
+flutter pub get
+flutter run
+```
