@@ -1,0 +1,19 @@
+
+node_modules/
+
+
+logs/
+*.log
+npm-debug.log*
+
+
+.env
+.env.*   # if you use multiple env files like .env.dev, .env.prod
+
+
+.DS_Store
+Thumbs.db
+
+
+dist/
+.env
