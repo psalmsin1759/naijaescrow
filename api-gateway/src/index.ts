@@ -50,6 +50,7 @@ const services = {
   payment: process.env.PAYMENT_SERVICE_URL || 'http://localhost:3003',
   wallet: process.env.WALLET_SERVICE_URL || 'http://localhost:3004',
   notification: process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3005',
+  dispute: process.env.DISPUTE_SERVICE_URL || 'http://localhost:3006',
 };
 
 app.use('/api/users', proxy(services.user));
@@ -57,6 +58,7 @@ app.use('/api/orders', authenticateJWT, proxy(services.order));
 app.use('/api/payments', authenticateJWT, proxy(services.payment));
 app.use('/api/wallets', authenticateJWT, proxy(services.wallet));
 app.use('/api/notifications', authenticateJWT, proxy(services.notification));
+app.use('/api/dispute', authenticateJWT, proxy(services.dispute));
 
 app.get('/', (req, res) => {
   res.send('API Gateway is running');
