@@ -1,24 +1,34 @@
-import  { IUser, User } from "../models/user.model";
+import  { IUser } from "../models/user.model";
 import {  UpdateQuery } from 'mongoose';
+import { UserRepository } from "../repositories/UserRepository";
 
+const UserRepo = new UserRepository();
 
+export const createUser = async (data: Partial<IUser>)  => {
+   
+    const UserEmail = await UserRepo.findByEmail(data.email!);
+    if (!UserEmail){
+        const error = new Error('No User found with this email');
+        (error as any).status = 404;
+        throw error;
+    }
 
-export const createUser = (data: Partial<IUser>) : Promise<IUser> => {
-    return User.create(data);
+    return UserRepo.create(data);
+    
 }
 
-export const allUsers = () : Promise<IUser[]> => {
-    return User.find();
+export const allUseres = async ()  => {
+    return await UserRepo.all();
 }
 
-export const findUserById = (id: string): Promise<IUser | null> => {
-    return User.findById(id);
+export const findUserById = async (id: string) => {
+    return await UserRepo.findById(id);
 }
 
-export const updateUser = (id: string, data: UpdateQuery<IUser>) : Promise<IUser | null> => {
-    return User.findByIdAndUpdate(id, data, {new: true});
+export const updateUserInfo =  async (id: string, data: UpdateQuery<IUser>) => {
+    return await UserRepo.update(id, data);
 }
 
-export const deleteUserById = async (id: string): Promise<IUser | null> => {
-  return User.findByIdAndDelete(id).exec();
+export const deleteUserById = async (id: string) => {
+    return await UserRepo.delete(id);
 };

@@ -1,24 +1,34 @@
-import  { IBusiness, Business } from "../models/business.model";
+import  { IBusiness } from "../models/business.model";
 import {  UpdateQuery } from 'mongoose';
+import { BusinessRepository } from "../repositories/BusinessRepository";
 
+const businessRepo = new BusinessRepository();
 
+export const createBusiness = async (data: Partial<IBusiness>)  => {
+   
+    const businessEmail = await businessRepo.findByEmail(data.email!);
+    if (!businessEmail){
+        const error = new Error('No business found with this email');
+        (error as any).status = 404;
+        throw error;
+    }
 
-export const createBusiness = (data: Partial<IBusiness>) : Promise<IBusiness> => {
-    return Business.create(data);
+    return businessRepo.create(data);
+    
 }
 
-export const allBusinesses = () : Promise<IBusiness[]> => {
-    return Business.find();
+export const allBusinesses = async ()  => {
+    return await businessRepo.all();
 }
 
-export const findBusinessById = (id: string): Promise<IBusiness | null> => {
-    return Business.findById(id);
+export const findBusinessById = async (id: string) => {
+    return await businessRepo.findById(id);
 }
 
-export const updateBusinessInfo = (id: string, data: UpdateQuery<IBusiness>) : Promise<IBusiness | null> => {
-    return Business.findByIdAndUpdate(id, data, {new: true});
+export const updateBusinessInfo =  async (id: string, data: UpdateQuery<IBusiness>) => {
+    return await businessRepo.update(id, data);
 }
 
-export const deleteBusinessById = async (id: string): Promise<IBusiness | null> => {
-  return Business.findByIdAndDelete(id).exec();
+export const deleteBusinessById = async (id: string) => {
+    return await businessRepo.delete(id);
 };
