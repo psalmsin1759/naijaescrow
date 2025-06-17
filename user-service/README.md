@@ -110,5 +110,5 @@ Swagger UI is available at:
 ```bash
 http://localhost:3001/api-docs
 ```
-![System Design](/docs/screenshots/udoc.png)
+![System Design](../docs/screenshots/udoc.png)
 
