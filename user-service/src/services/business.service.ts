@@ -7,8 +7,8 @@ const businessRepo = new BusinessRepository();
 export const createBusiness = async (data: Partial<IBusiness>)  => {
    
     const businessEmail = await businessRepo.findByEmail(data.email!);
-    if (!businessEmail){
-        const error = new Error('No business found with this email');
+    if (businessEmail){
+        const error = new Error('There is a business with this email');
         (error as any).status = 404;
         throw error;
     }

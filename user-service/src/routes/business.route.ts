@@ -7,7 +7,7 @@ const businessRouter: Router = express.Router();
 
 /**
  * @swagger
- * /api/businesses:
+ * /businesses:
  *   get:
  *     summary: Get all businesses
  *     tags: [Business]
@@ -32,7 +32,7 @@ businessRouter.get('/', BusinessController.getAllBusinesses);
 
 /**
  * @swagger
- * /api/businesses/{id}:
+ * /businesses/{id}:
  *   get:
  *     summary: Get a business by ID
  *     tags: [Business]
@@ -57,7 +57,7 @@ businessRouter.get('/:id', BusinessController.getBusinessById);
 
 /**
  * @swagger
- * /api/businesses:
+ * /businesses:
  *   post:
  *     summary: Create a new business
  *     tags: [Business]
@@ -81,7 +81,7 @@ businessRouter.post('/', validate(createBusinessSchema), BusinessController.crea
 
 /**
  * @swagger
- * /api/businesses/{id}:
+ * /businesses/{id}:
  *   put:
  *     summary: Update an existing business
  *     tags: [Business]
@@ -112,7 +112,7 @@ businessRouter.put('/:id', validate(updateBusinessSchema), BusinessController.up
 
 /**
  * @swagger
- * /api/businesses/{id}:
+ * /businesses/{id}:
  *   delete:
  *     summary: Delete a business
  *     tags: [Business]

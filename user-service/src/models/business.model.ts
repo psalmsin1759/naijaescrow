@@ -7,7 +7,7 @@ export interface IBusiness extends Document {
   website?: string;
   description?: string;
   address?: string;
-  admins?: mongoose.Types.ObjectId[]; 
+  //admins?: mongoose.Types.ObjectId[]; 
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;

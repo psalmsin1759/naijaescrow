@@ -7,8 +7,8 @@ const UserRepo = new UserRepository();
 export const createUser = async (data: Partial<IUser>)  => {
    
     const UserEmail = await UserRepo.findByEmail(data.email!);
-    if (!UserEmail){
-        const error = new Error('No User found with this email');
+    if (UserEmail){
+        const error = new Error('User found with this email');
         (error as any).status = 404;
         throw error;
     }
@@ -17,7 +17,7 @@ export const createUser = async (data: Partial<IUser>)  => {
     
 }
 
-export const allUseres = async ()  => {
+export const allUsers = async ()  => {
     return await UserRepo.all();
 }
 

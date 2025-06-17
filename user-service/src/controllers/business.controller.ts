@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import * as BusinessService from '../services/business.service';
-import { ResponseResult } from '../utils/types';
 
 
 export const createBusiness = async (req: Request, res: Response) => {
