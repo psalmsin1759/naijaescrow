@@ -38,13 +38,6 @@ const BusinessSchema: Schema<IBusiness> = new Schema(
     address: {
       type: String,
     },
-    admins: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Admin',
-        required: true,
-      },
-    ],
     isActive: {
        type: Boolean,
        default: true,

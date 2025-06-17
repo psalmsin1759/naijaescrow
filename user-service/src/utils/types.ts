@@ -3,3 +3,10 @@ export interface EmailMessage {
   subject: string;
   body: string;
 }
+
+export interface ResponseResult {
+  success: boolean;
+  message: string;
+  data?: any;
+  token?: string;
+}
