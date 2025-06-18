@@ -86,7 +86,9 @@ npm run build && npm start
 
 ## API Endpoints
 
-Base URL: http://localhost:3001/api/users
+http://localhost:3001/api/users
+http://localhost:3001/api/business
+http://localhost:3001/api/admins
 
 | Method | Endpoint           | Description              |
 | ------ | ------------------ | ------------------------ |
