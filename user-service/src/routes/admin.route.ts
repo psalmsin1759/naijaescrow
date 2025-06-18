@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import * as AdminController from '../controllers/admin.controller';
 import { validate } from '../middlewares/validate';
-import { validateUser, validateLogin, validateForgotPassword, validateResetPassword } from '../validators/admin.validator';
+import { createAdminSchema, validateAdmin, validateLogin, validateForgotPassword, validateResetPassword } from '../validators/admin.validator';
 
 
 
@@ -91,7 +91,7 @@ adminRouter.get('/:id', AdminController.getAdminById);
  *                 data:
  *                   $ref: '#/components/schemas/Admin'
  */
-adminRouter.post('/', validate(validateUser), AdminController.createAdmin);
+adminRouter.post('/', validate(createAdminSchema), AdminController.createAdmin);
 
 /**
  * @swagger

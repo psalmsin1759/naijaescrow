@@ -8,7 +8,7 @@ import { connectRabbitMQ } from "./utils/rabbitmq";
 import connectDB from "./database/mongodb";
 import businessRouter from "./routes/business.route"
 import userRouter from "./routes/user.route"
-import adminRouter from "./routes/user.route"
+import adminRouter from "./routes/admin.route"
 
 
 const app = express();

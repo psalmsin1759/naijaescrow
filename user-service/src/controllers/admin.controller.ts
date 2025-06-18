@@ -3,7 +3,9 @@ import * as AdminService from '../services/admin.service';
 
 export const createAdmin = async (req: Request, res: Response) => {
   try {
+    console.log (req.body);
     const admin = await AdminService.createAdmin(req.body);
+    
     res.status(201).json({ success: true, message: 'Admin created successfully', data: admin });
   } catch (error: any) {
     res.status(error.status || 500).json({ success: false, message: error.message });

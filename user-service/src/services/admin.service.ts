@@ -18,8 +18,8 @@ interface Result {
 export const createAdmin = async (data: Partial<IAdmin>)  => {
    
     const AdminEmail = await adminRepo.findByEmail(data.email!);
-    if (!AdminEmail){
-        const error = new Error('No Admin found with this email');
+    if (AdminEmail){
+        const error = new Error('Admin with this email found');
         (error as any).status = 404;
         throw error;
     }

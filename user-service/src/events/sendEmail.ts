@@ -5,7 +5,7 @@ import { EmailMessage } from '../utils/types';
 export async function sendEmail(email: string, subject: string, body: string): Promise<void> {
   try {
     const message = {
-      type: 'send_email',
+      type: 'escrow_sendEmail',
       data: {
         to: email,
         subject,
@@ -13,7 +13,7 @@ export async function sendEmail(email: string, subject: string, body: string): P
       } as EmailMessage,
     };
 
-    await sendToQueue('email_notification', message);
+    await sendToQueue('escrow_sendEmail', message);
     console.log(`[EmailService] Queued email to ${email}`);
   } catch (error: any) {
     console.error('[EmailService] Failed to queue email:', error.message);
