@@ -116,7 +116,7 @@ SENDGRID_API_KEY=your_sendgrid_key
 
 ```
 
-![System Design](/docs/screenshots/emailtemplate.png)
+![System Design](../docs/screenshots/emailtemplate.png)
 
 
 
@@ -164,7 +164,7 @@ Queue: email_notification
 
 ```
 
-![System Design](/docs/screenshots/rabbitmqsc.png)
+![System Design](../docs/screenshots/rabbitmqsc.png)
 
 
 ### Build for Production
