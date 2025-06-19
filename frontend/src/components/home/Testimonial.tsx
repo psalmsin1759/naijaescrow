@@ -42,7 +42,7 @@ export default function Testimonial() {
   };
 
   return (
-    <div className="py-12 px-4 md:px-10 flex flex-col items-center gap-8 bg-gray-50">
+    <div className="py-12 px-4 mb-10 md:px-10 flex flex-col items-center gap-8 bg-gray-50">
       <motion.div
         className="text-center max-w-2xl"
         initial={{ opacity: 0, y: -30 }}
