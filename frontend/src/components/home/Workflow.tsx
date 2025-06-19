@@ -14,7 +14,7 @@ interface Banner {
   icon: ReactElement;
 }
 
-const cardVariants = {
+/* const cardVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
     opacity: 1,
@@ -25,7 +25,7 @@ const cardVariants = {
       ease: "easeOut",
     },
   }),
-};
+}; */
 
 export default function Banner() {
   const workflows: Banner[] = [
@@ -93,7 +93,7 @@ export default function Banner() {
           <motion.div
             key={index}
             custom={index}
-            variants={cardVariants}
+            //variants={cardVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
