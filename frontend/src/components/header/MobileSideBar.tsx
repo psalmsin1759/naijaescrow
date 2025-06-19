@@ -1,5 +1,5 @@
 import React from "react";
-import { navItems } from "@/data/nav";
+import { navItems } from "@/utils/data";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 

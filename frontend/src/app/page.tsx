@@ -1,6 +1,7 @@
 import NavBar from "@/components/header/NavBar";
 import Hero from "@/components/home/Hero";
 import Workflow from "@/components/home/Workflow";
+import Testimonial from "@/components/home/Testimonial";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
         <Workflow />
         {/* Workflow  */}
         {/* Testimonial  */}
+        <Testimonial />
         {/* Footer  */}
 
     </div>

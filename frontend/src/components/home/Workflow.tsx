@@ -4,7 +4,7 @@ import { FiEdit } from "react-icons/fi";
 import { MdLink, MdCheckCircleOutline } from "react-icons/md";
 import { AiFillLock } from "react-icons/ai";
 import { FaShippingFast, FaMoneyBillWave } from "react-icons/fa";
-import BannerCard from "@/components/home/WorkflowCard";
+import BannerCard from "@/components/cards/WorkflowCard";
 import { motion } from "framer-motion";
 
 
@@ -88,7 +88,7 @@ export default function Banner() {
       </motion.div>
 
      
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {workflows.map((workflow, index) => (
           <motion.div
             key={index}

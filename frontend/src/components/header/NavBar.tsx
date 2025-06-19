@@ -2,7 +2,7 @@
 import React, {useState} from "react";
 import Link from "next/link";
 import Logo from "@/components/shared/Logo";
-import { navItems } from "@/data/nav";
+import { navItems } from "@/utils/data";
 import { IoMdMenu } from "react-icons/io";
 import MobileSideBar from "@/components/header/MobileSideBar";
 
