@@ -14,7 +14,7 @@ export default function NavBar() {
     <div className="py-6 px-10 ">
       <nav>
         <div className="flex justify-between items-center">
-          <Logo type="header" />
+          <Logo  />
           <div className="hidden md:block">
             <ul className=" flex items-center text-gray-600 gap-6 ">
               {navItems.map((navItem, index) => (

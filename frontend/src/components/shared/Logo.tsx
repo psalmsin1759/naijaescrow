@@ -1,16 +1,12 @@
 import React from 'react'
 import Image from 'next/image'
 
-interface LogoType {
-  type: string;
-}
-export default function Logo({type}: LogoType) {
-  const headerLogo = "/assets/images/naijaescrowlightlogo.png";
-  const footerLogo = "/assets/images/naijaescrowdarklogo.png";
 
+export default function Logo() {
+  
   return (
     <div>
-      <Image src={type == "header" ?  headerLogo: footerLogo} alt='Naija Escrow' width={187} height={50} />
+      <Image src={"/assets/images/naijaescrowlogo.png"} alt='Naija Escrow' width={180} height={81} />
     </div>
   )
 }
