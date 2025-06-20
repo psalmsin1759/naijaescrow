@@ -2,53 +2,37 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-
-type Business = {
-  name: string;
-  email: string;
-  phone: string;
-  website?: string;
-  description?: string;
-  address?: string;
-};
+import { useForm } from '@/context/FormContext';
 
 export default function BusinessDetails({ onNext }: { onNext: () => void }) {
-  const [formData, setFormData] = useState<Business>({
-    name: '',
-    email: '',
-    phone: '',
-    website: '',
-    description: '',
-    address: '',
-  });
+  const { data, setData } = useForm();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const [errors, setErrors] = useState<Partial<Business>>({});
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const errs: typeof errors = {};
+    if (!data.businessName) errs.businessName = 'Business name is required';
+    if (!data.businessEmail) errs.businessEmail = 'Email is required';
+    if (!data.businessPhone) errs.businessPhone = 'Phone is required';
 
-  const validate = () => {
-    const newErrors: Partial<Business> = {};
-    if (!formData.name) newErrors.name = 'Business name is required';
-    if (!formData.email) newErrors.email = 'Email is required';
-    if (!formData.phone) newErrors.phone = 'Phone number is required';
-    return newErrors;
-  };
-
-  const handleSubmit = () => {
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
       return;
     }
 
-    console.log('Business Data:', formData);
     onNext();
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setData({ [name]: value });
+    console.log ("data: " + data);
+  };
+
   return (
-    <motion.div
+    <motion.form
+      onSubmit={handleSubmit}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
@@ -60,42 +44,41 @@ export default function BusinessDetails({ onNext }: { onNext: () => void }) {
         <div>
           <label className="block text-sm font-medium text-gray-700">Business Name</label>
           <input
-            name="name"
-            value={formData.name}
+            name="businessName"
+            value={data.businessName || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
+          {errors.businessName && <p className="text-sm text-red-600">{errors.businessName}</p>}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Email Address</label>
           <input
-            name="email"
+            name="businessEmail"
             type="email"
-            value={formData.email}
+            value={data.businessEmail || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+          {errors.businessEmail && <p className="text-sm text-red-600">{errors.businessEmail}</p>}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Phone Number</label>
           <input
-            name="phone"
-            value={formData.phone}
+            name="businessPhone"
+            value={data.businessPhone || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          {errors.phone && <p className="text-sm text-red-600">{errors.phone}</p>}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Website (optional)</label>
           <input
             name="website"
-            value={formData.website}
+            value={data.website || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
@@ -105,7 +88,7 @@ export default function BusinessDetails({ onNext }: { onNext: () => void }) {
           <label className="block text-sm font-medium text-gray-700">Address</label>
           <input
             name="address"
-            value={formData.address}
+            value={data.address || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
@@ -116,21 +99,21 @@ export default function BusinessDetails({ onNext }: { onNext: () => void }) {
           <textarea
             name="description"
             rows={3}
-            value={formData.description}
+            value={data.description || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
       </div>
 
-      <div className="pt-6">
+      <div className="pt-6 text-end">
         <button
-          onClick={handleSubmit}
+          type="submit"
           className="px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-all duration-300"
         >
           Continue
         </button>
       </div>
-    </motion.div>
+    </motion.form>
   );
 }

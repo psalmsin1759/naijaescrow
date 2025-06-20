@@ -2,42 +2,28 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-
-interface Admin {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-};
+import { useForm } from '@/context/FormContext';
 
 export default function AddAdmin({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [formData, setFormData] = useState<Admin>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
-  });
-
-  const [errors, setErrors] = useState<Partial<Admin>>({});
+  const { data, setData } = useForm();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setData({ [name]: value });
   };
 
   const validate = () => {
-    const newErrors: Partial<Admin> = {};
-    if (!formData.firstName) newErrors.firstName = 'First name is required';
-    if (!formData.lastName) newErrors.lastName = 'Last name is required';
-    if (!formData.email) newErrors.email = 'Email is required';
-    if (!formData.phone) newErrors.phone = 'Phone is required';
-    if (!formData.password) newErrors.password = 'Password is required';
-    if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = 'Passwords do not match';
-    return newErrors;
+    const errs: typeof errors = {};
+
+    if (!data.adminFirstName) errs.adminFirstName = 'First name is required';
+    if (!data.adminLastName) errs.adminLastName = 'Last name is required';
+    if (!data.adminEmail) errs.adminEmail = 'Email is required';
+    if (!data.password) errs.password = 'Password is required';
+    if (!data.confirmPassword) errs.confirmPassword = 'Confirm password is required';
+    if (data.password !== data.confirmPassword) errs.confirmPassword = 'Passwords do not match';
+
+    return errs;
   };
 
   const handleSubmit = () => {
@@ -47,7 +33,6 @@ export default function AddAdmin({ onNext, onBack }: { onNext: () => void; onBac
       return;
     }
 
-    console.log('Admin Data:', formData);
     onNext();
   };
 
@@ -64,46 +49,45 @@ export default function AddAdmin({ onNext, onBack }: { onNext: () => void; onBac
         <div>
           <label className="block text-sm font-medium text-gray-700">First Name</label>
           <input
-            name="firstName"
-            value={formData.firstName}
+            name="adminFirstName"
+            value={data.adminFirstName || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          {errors.firstName && <p className="text-sm text-red-600">{errors.firstName}</p>}
+          {errors.adminFirstName && <p className="text-sm text-red-600">{errors.adminFirstName}</p>}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Last Name</label>
           <input
-            name="lastName"
-            value={formData.lastName}
+            name="adminLastName"
+            value={data.adminLastName || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          {errors.lastName && <p className="text-sm text-red-600">{errors.lastName}</p>}
+          {errors.adminLastName && <p className="text-sm text-red-600">{errors.adminLastName}</p>}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Email</label>
           <input
-            name="email"
+            name="adminEmail"
             type="email"
-            value={formData.email}
+            value={data.adminEmail || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+          {errors.adminEmail && <p className="text-sm text-red-600">{errors.adminEmail}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Phone</label>
+          <label className="block text-sm font-medium text-gray-700">Phone (optional)</label>
           <input
-            name="phone"
-            value={formData.phone}
+            name="adminPhone"
+            value={data.adminPhone || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          {errors.phone && <p className="text-sm text-red-600">{errors.phone}</p>}
         </div>
 
         <div>
@@ -111,7 +95,7 @@ export default function AddAdmin({ onNext, onBack }: { onNext: () => void; onBac
           <input
             name="password"
             type="password"
-            value={formData.password}
+            value={data.password || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
@@ -123,7 +107,7 @@ export default function AddAdmin({ onNext, onBack }: { onNext: () => void; onBac
           <input
             name="confirmPassword"
             type="password"
-            value={formData.confirmPassword}
+            value={data.confirmPassword || ''}
             onChange={handleChange}
             className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />

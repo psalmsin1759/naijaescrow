@@ -8,13 +8,13 @@ export default function SidebarStepper({ step }: { step: number }) {
       title: 'Business Details',
       description: 'Tell us about your business to get started.',
     },
+     {
+      title: 'Verify Email',
+      description: 'Check your email and enter the verification code.',
+    },
     {
       title: 'Add Admin',
       description: 'Assign an admin to manage your business account.',
-    },
-    {
-      title: 'Verify Email',
-      description: 'Check your email and enter the verification code.',
     },
     {
       title: 'Review',

@@ -1,31 +1,16 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useForm } from '@/context/FormContext';
 
-interface ReviewProps {
+export default function Review({
+  onBack,
+  onSubmit,
+}: {
   onBack: () => void;
   onSubmit: () => void;
-  data?: {
-    business?: {
-      name: string;
-      email: string;
-      phone?: string;
-      website?: string;
-      address?: string;
-      description?: string;
-    };
-    admin?: {
-      firstName: string;
-      lastName: string;
-      email: string;
-      phone?: string;
-    };
-  };
-}
-
-export default function Review({ onBack, onSubmit }: ReviewProps) {
-  /* const business = data?.business || {};
-  const admin = data?.admin || {}; */
+}) {
+  const { data } = useForm();
 
   return (
     <motion.div
@@ -42,12 +27,12 @@ export default function Review({ onBack, onSubmit }: ReviewProps) {
         <div>
           <h3 className="text-lg font-semibold text-primary mb-2">Business Details</h3>
           <div className="text-sm text-gray-700 space-y-1">
-            {/* <p><span className="font-medium">Name:</span> {business.name || '—'}</p>
-            <p><span className="font-medium">Email:</span> {business.email || '—'}</p>
-            <p><span className="font-medium">Phone:</span> {business.phone || '—'}</p>
-            <p><span className="font-medium">Website:</span> {business.website || '—'}</p>
-            <p><span className="font-medium">Address:</span> {business.address || '—'}</p>
-            <p><span className="font-medium">Description:</span> {business.description || '—'}</p> */}
+            <p><span className="font-medium">Name:</span> {data.businessName || '—'}</p>
+            <p><span className="font-medium">Email:</span> {data.businessEmail || '—'}</p>
+            <p><span className="font-medium">Phone:</span> {data.businessPhone || '—'}</p>
+            <p><span className="font-medium">Website:</span> {data.website || '—'}</p>
+            <p><span className="font-medium">Address:</span> {data.address || '—'}</p>
+            <p><span className="font-medium">Description:</span> {data.description || '—'}</p>
           </div>
         </div>
 
@@ -55,14 +40,14 @@ export default function Review({ onBack, onSubmit }: ReviewProps) {
         <div>
           <h3 className="text-lg font-semibold text-primary mb-2">Admin Info</h3>
           <div className="text-sm text-gray-700 space-y-1">
-            {/* <p><span className="font-medium">Name:</span> {admin.firstName} {admin.lastName}</p>
-            <p><span className="font-medium">Email:</span> {admin.email}</p>
-            <p><span className="font-medium">Phone:</span> {admin.phone || '—'}</p> */}
+            <p><span className="font-medium">Name:</span> {data.adminFirstName} {data.adminLastName}</p>
+            <p><span className="font-medium">Email:</span> {data.adminEmail}</p>
+            <p><span className="font-medium">Phone:</span> {data.adminPhone || '—'}</p>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex justify-between pt-6">
         <button
           onClick={onBack}
           className="px-6 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition"
