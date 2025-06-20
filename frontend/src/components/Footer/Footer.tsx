@@ -86,7 +86,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="flex justify-center items-center text-white text-sm">
+        <div className="flex justify-center items-center text-gray-600 text-sm">
           Copyright © 2025 Samson Ude Lab
         </div>
       </div>
