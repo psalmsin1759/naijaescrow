@@ -8,8 +8,8 @@ export const navItems  = [
         path: "/about"
     },
     {
-        title: "Features",
-        path: "/features"
+        title: "FAQs",
+        path: "/faqs"
     },
     {
         title: "Contact",
