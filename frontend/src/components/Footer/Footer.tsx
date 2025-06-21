@@ -2,6 +2,7 @@ import React from "react";
 import Logo from "../shared/Logo";
 import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { SiTiktok } from "react-icons/si";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -10,7 +11,7 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 md:gap-4 py-5 items-center text-white  border-t-2 border-gray-300/10">
           <div>
             <div>
-              <Logo  />
+              <Logo />
             </div>
             <p className=" text-[10px] mt-2">
               NaijaEscrow is Nigeria’s trusted digital escrow platform, designed
@@ -59,30 +60,53 @@ export default function Footer() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 md:col-span-3 md:ml-14">
             <div className="py-8 px-4">
-                <h1 className="sm:text-lg text-xl font-bold sm:text-left text-justify mb-5" >Important links</h1>
-                <ul className="flex flex-col gap-3 text-md text-gray-600 ">
-                    <li className="hover:text-white">Home</li>
-                    <li className="hover:text-white">About</li>
-                    <li className="hover:text-white">Services</li>
-                    <li className="hover:text-white">Contact</li>
-                    <li className="hover:text-white">FAQs</li>
-                </ul>
+              <h1 className="sm:text-lg text-xl font-bold sm:text-left text-justify mb-5">
+                Important links
+              </h1>
+              <ul className="flex flex-col gap-3 text-md text-gray-600 ">
+                <li className="hover:text-white">
+                  <Link href="/">Home</Link>
+                </li>
+                <li className="hover:text-white">
+                 
+                  <Link href="/about">About</Link>
+                </li>
+               
+                <li className="hover:text-white">
+                  <Link href="/contact">Contact</Link>
+                </li>
+                <li className="hover:text-white">
+                  <Link href="/faqs">FAQs</Link>
+                </li>
+              </ul>
             </div>
             <div className="py-8 px-4">
-                <h1 className="sm:text-xl text-xl font-bold sm:text-left text-justify mb-5 " >Support</h1>
-                <ul className="flex flex-col text-md gap-3 text-gray-600">
-                    <li className="hover:text-white">Contact</li>
-                    <li className="hover:text-white">Terms</li>
-                    <li className="hover:text-white">Privacy</li>
-                    <li className="hover:text-white">Dispute</li>
-                </ul>
+              <h1 className="sm:text-xl text-xl font-bold sm:text-left text-justify mb-5 ">
+                Support
+              </h1>
+              <ul className="flex flex-col text-md gap-3 text-gray-600">
+                <li className="hover:text-white">
+                  <Link href="/contact">Contact</Link>
+                </li>
+                <li className="hover:text-white">
+                  <Link href="/terms">Terms</Link>
+                </li>
+                <li className="hover:text-white">
+                  <Link href="/privacy">Privacy</Link>
+                </li>
+                <li className="hover:text-white">Dispute</li>
+              </ul>
             </div>
             <div className="py-8 px-4">
-                <h1 className="sm:text-xl text-xl font-bold sm:text-left text-justify mb-5" >Resources</h1>
-                <ul className="flex flex-col text-md gap-3 text-gray-600">
-                    <li className="hover:text-white">Blog</li>
-                    <li className="hover:text-white">FAQs</li>
-                </ul>
+              <h1 className="sm:text-xl text-xl font-bold sm:text-left text-justify mb-5">
+                Resources
+              </h1>
+              <ul className="flex flex-col text-md gap-3 text-gray-600">
+                <li className="hover:text-white">Blog</li>
+                <li className="hover:text-white">
+                  <Link href="/faqs">FAQs</Link>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -90,7 +114,6 @@ export default function Footer() {
           Copyright © 2025 Samson Ude Lab
         </div>
       </div>
-
     </div>
   );
 }
