@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -51,7 +52,7 @@ export default function Hero() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <button className="btn btn-primary">Register</button>
+          <Link href="/register" className="btn btn-primary">Register</Link>
           <button>🔐 Start Secure Trading Today</button>
         </motion.div>
       </motion.div>

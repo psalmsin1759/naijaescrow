@@ -29,7 +29,6 @@ export default function DashboardPage() {
       transition={{ duration: 0.4 }}
       className="space-y-8"
     >
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
           {
@@ -75,7 +74,6 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Create New Order */}
       <div className="p-6 bg-white shadow rounded-lg flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">Create New Escrow Order</h3>
@@ -93,64 +91,66 @@ export default function DashboardPage() {
 
       {/* Recent Orders Table */}
       <>
-        <div className="bg-white shadow rounded-lg p-6 overflow-x-auto">
+        <div className="w-full overflow-x-auto bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
-          <table className="min-w-full text-sm text-left">
-            <thead className="bg-gray-100 text-gray-600">
-              <tr>
-                <th className="py-2 px-4">Order ID</th>
-                <th className="py-2 px-4">Buyer</th>
-                <th className="py-2 px-4">Amount</th>
-                <th className="py-2 px-4">Status</th>
-                <th className="py-2 px-4">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                {
-                  id: "ORD1234",
-                  buyer: "Chinedu O.",
-                  amount: "₦50,000",
-                  status: "Pending",
-                  date: "2025-06-14",
-                },
-                {
-                  id: "ORD1233",
-                  buyer: "Ngozi A.",
-                  amount: "₦75,000",
-                  status: "Completed",
-                  date: "2025-06-13",
-                },
-                {
-                  id: "ORD1232",
-                  buyer: "Ibrahim K.",
-                  amount: "₦30,000",
-                  status: "Cancelled",
-                  date: "2025-06-12",
-                },
-              ].map((order, index) => (
-                <tr key={index} className="border-t hover:bg-gray-50">
-                  <td className="py-2 px-4 font-medium">{order.id}</td>
-                  <td className="py-2 px-4">{order.buyer}</td>
-                  <td className="py-2 px-4">{order.amount}</td>
-                  <td className="py-2 px-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        order.status === "Completed"
-                          ? "bg-green-100 text-green-800"
-                          : order.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="py-2 px-4">{order.date}</td>
+          <div className="min-w-full sm:min-w-[640px]">
+            <table className=" w-full text-sm text-left">
+              <thead className="bg-gray-100 text-gray-600">
+                <tr>
+                  <th className="py-2 px-4">Order ID</th>
+                  <th className="py-2 px-4">Buyer</th>
+                  <th className="py-2 px-4">Amount</th>
+                  <th className="py-2 px-4">Status</th>
+                  <th className="py-2 px-4">Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {[
+                  {
+                    id: "ORD1234",
+                    buyer: "Chinedu O.",
+                    amount: "₦50,000",
+                    status: "Pending",
+                    date: "2025-06-14",
+                  },
+                  {
+                    id: "ORD1233",
+                    buyer: "Ngozi A.",
+                    amount: "₦75,000",
+                    status: "Completed",
+                    date: "2025-06-13",
+                  },
+                  {
+                    id: "ORD1232",
+                    buyer: "Ibrahim K.",
+                    amount: "₦30,000",
+                    status: "Cancelled",
+                    date: "2025-06-12",
+                  },
+                ].map((order, index) => (
+                  <tr key={index} className="border-t hover:bg-gray-50">
+                    <td className="py-2 px-4 font-medium">{order.id}</td>
+                    <td className="py-2 px-4">{order.buyer}</td>
+                    <td className="py-2 px-4">{order.amount}</td>
+                    <td className="py-2 px-4">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          order.status === "Completed"
+                            ? "bg-green-100 text-green-800"
+                            : order.status === "Pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="py-2 px-4">{order.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         <Modal
           isOpen={showCreateModal}
