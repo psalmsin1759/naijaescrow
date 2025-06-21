@@ -10,6 +10,10 @@ export default function NavBar() {
 
   const [open, setOpen] = useState(false);
 
+  const closeMobileNave = () => {
+    setOpen(false);
+  }
+
   return (
     <div className="py-6 px-10 ">
       <nav>
@@ -41,7 +45,7 @@ export default function NavBar() {
       </nav>
 
      
-      <MobileSideBar open={open} />
+      <MobileSideBar open={open} close={closeMobileNave} />
     </div>
   );
 }
