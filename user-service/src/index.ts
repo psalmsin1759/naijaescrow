@@ -19,7 +19,7 @@ app.use('/api/businesses', businessRouter);
 app.use('/api/users', userRouter);
 app.use('/api/admins', adminRouter);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.SERVER_PORT || 3001;
 const HOST = process.env.HOST || "http://localhost";
 
  app.listen(PORT, () => {
