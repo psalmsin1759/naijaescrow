@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-interface FormData {
+export interface FormData {
   businessName?: string;
   businessEmail?: string;
   businessPhone?: string;

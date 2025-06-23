@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import React from "react";
 
@@ -6,6 +5,7 @@ import "../globals.css";
 
 import { Geist, Geist_Mono } from "next/font/google";
 import DashboardChildLayout from "./dashboard_layout";
+import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
- export const metadata: Metadata = {
+export const metadata: Metadata = {
   title: "NaijaEscrow - Dashboard",
   description: "NaijaEscrow",
 };
@@ -27,16 +27,14 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
- 
-
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-       <DashboardChildLayout>
-        {children}
-       </DashboardChildLayout>
+        <DashboardChildLayout>
+          <AuthProvider> {children}</AuthProvider>
+        </DashboardChildLayout>
       </body>
     </html>
   );

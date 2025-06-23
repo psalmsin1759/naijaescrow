@@ -20,6 +20,7 @@ export default function BusinessDetails({ onNext }: { onNext: () => void }) {
       setErrors(errs);
       return;
     }
+    
 
     onNext();
   };

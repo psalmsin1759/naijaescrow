@@ -3,13 +3,13 @@
 import { motion } from 'framer-motion';
 import { useForm } from '@/context/FormContext';
 
-export default function Review({
-  onBack,
-  onSubmit,
-}: {
+interface ReviewProps {
   onBack: () => void;
   onSubmit: () => void;
-}) {
+  loading: boolean;
+}
+
+export default function Review({ onBack, onSubmit, loading }: ReviewProps) {
   const { data } = useForm();
 
   return (
@@ -57,9 +57,14 @@ export default function Review({
 
         <button
           onClick={onSubmit}
-          className="px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition"
+          disabled={loading}
+          className={`px-6 py-2 rounded-lg font-medium transition ${
+            loading
+              ? 'bg-primary/50 text-white cursor-not-allowed'
+              : 'bg-primary text-white hover:bg-primary-dark'
+          }`}
         >
-          Submit
+          {loading ? 'Submitting...' : 'Submit'}
         </button>
       </div>
     </motion.div>

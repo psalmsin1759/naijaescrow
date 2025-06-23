@@ -5,6 +5,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import NavBar from "@/components/header/NavBar";
 import Footer from "@/components/Footer/Footer";
+import { ToastContainer } from "react-toastify";
+import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,9 +36,9 @@ export default function RootLayout({
         <div className="overflow-x-hidden">
           <NavBar />
           <main className="min-h-screen">
-             {children}
+            <AuthProvider> {children}</AuthProvider>
           </main>
-         
+          <ToastContainer />
           <Footer />
         </div>
       </body>
