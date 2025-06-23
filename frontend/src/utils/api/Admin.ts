@@ -59,6 +59,69 @@ export const login = async (
   }
 };
 
+export const forgotPassword = async (
+  email: string
+): Promise<AdminResponse> => {
+  try {
+    const res = await fetch(`${baseUrl}admins/forgot-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed ");
+    }
+
+    const data = await res.json();
+    return {
+      success: true,
+      message: data.message || "Password reset link sent to your email",
+    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Unknown error occurred",
+    };
+  }
+};
+
+export const resetPassword = async (
+  token: string,
+  password: string
+): Promise<AdminResponse> => {
+  try {
+    const res = await fetch(`${baseUrl}admins/reset-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token, password }),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed ");
+    }
+
+    const data = await res.json();
+    return {
+      success: true,
+      message: data.message || "Password reset link sent to your email",
+    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Unknown error occurred",
+    };
+  }
+};
+
 export const addAdmin = async (payload: Partial<Admin> & { password: string }): Promise<AdminResponse> => {
   try {
     const res = await fetch(`${baseUrl}admins`, {

@@ -1,24 +1,40 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaEnvelope } from 'react-icons/fa';
-import Link from 'next/link';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { FaEnvelope } from "react-icons/fa";
+import Link from "next/link";
+import { forgotPassword } from "@/utils/api/Admin";
+import { toast } from "react-toastify";
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    
+    try {
+      if (email) {
+        const res = await forgotPassword(email);
+        if (res.success) {
+          toast.success(res.message);
+          setEmail("")
+        } else {
+          toast.error(res.message || "Something went wrong");
+        }
+      } else {
+        toast.success("Please enter all fields");
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error.message || "Server error occurred");
+    } finally {
       setLoading(false);
-      setSubmitted(true);
-    }, 1500);
+    }
   };
 
   return (
@@ -36,38 +52,34 @@ export default function ForgotPasswordPage() {
           Enter your email address to reset your password.
         </p>
 
-        {submitted ? (
-          <div className="text-center text-green-600 font-medium text-sm">
-            ✅ If that email exists, a password reset link has been sent.
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block mb-1 text-sm font-medium">Email Address</label>
-              <div className="relative">
-                <span className="absolute top-3 left-3 text-gray-400">
-                  <FaEnvelope />
-                </span>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none text-sm"
-                />
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block mb-1 text-sm font-medium">
+              Email Address
+            </label>
+            <div className="relative">
+              <span className="absolute top-3 left-3 text-gray-400">
+                <FaEnvelope />
+              </span>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none text-sm"
+              />
             </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary-dark transition font-medium text-sm"
-            >
-              {loading ? 'Sending...' : 'Send Reset Link'}
-            </button>
-          </form>
-        )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary-dark transition font-medium text-sm"
+          >
+            {loading ? "Sending..." : "Send Reset Link"}
+          </button>
+        </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
           <Link href="/login" className="text-primary hover:underline">

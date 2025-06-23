@@ -1,51 +1,46 @@
-'use client';
+"use client";
 
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaLock } from 'react-icons/fa';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { FaLock } from "react-icons/fa";
+import { resetPassword } from "@/utils/api/Admin";
+import { toast } from "react-toastify";
+import Link from "next/link";
 
-export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const token = searchParams.get('token');
+export default function ResetPasswordPage({
+  params,
+}: {
+  params: { token: string };
+}) {
+  const token = params.token;
 
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [resetDone, setResetDone] = useState(false);
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
-    if (!token) {
-      setError('Invalid or missing token.');
-      return;
-    }
-
-    if (!password || !confirmPassword) {
-      setError('Please fill in all fields.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-
     setLoading(true);
-
+    console.log(token);
+    console.log(password);
     try {
-      // Simulate password reset API
-      setTimeout(() => {
-        setResetDone(true);
-        setLoading(false);
-      }, 1500);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      setError('Something went wrong.');
+      if (password === confirmPassword) {
+        const res = await resetPassword(token!, password);
+        if (res.success) {
+          toast.success(res.message);
+          setPassword("");
+          setConfirmPassword("");
+        } else {
+          toast.error(res.message || "Something went wrong");
+        }
+      } else {
+        toast.error("Password mismatch");
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error.message || "Server error occurred");
+    } finally {
       setLoading(false);
     }
   };
@@ -65,70 +60,59 @@ export default function ResetPasswordPage() {
           Enter a new password for your account.
         </p>
 
-        {error && (
-          <div className="text-red-600 text-sm text-center mb-4">{error}</div>
-        )}
-
-        {resetDone ? (
-          <div className="text-green-600 text-sm text-center font-medium">
-            ✅ Your password has been reset. You can now{' '}
-            <button
-              onClick={() => router.push('/login')}
-              className="text-primary underline"
-            >
-              login
-            </button>
-            .
+        <form onSubmit={handleReset} className="space-y-4">
+          <div>
+            <label className="block mb-1 text-sm font-medium">
+              New Password
+            </label>
+            <div className="relative">
+              <span className="absolute top-3 left-3 text-gray-400">
+                <FaLock />
+              </span>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none text-sm"
+              />
+            </div>
           </div>
-        ) : (
-          <form onSubmit={handleReset} className="space-y-4">
-            <div>
-              <label className="block mb-1 text-sm font-medium">
-                New Password
-              </label>
-              <div className="relative">
-                <span className="absolute top-3 left-3 text-gray-400">
-                  <FaLock />
-                </span>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none text-sm"
-                />
-              </div>
-            </div>
 
-            <div>
-              <label className="block mb-1 text-sm font-medium">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <span className="absolute top-3 left-3 text-gray-400">
-                  <FaLock />
-                </span>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none text-sm"
-                />
-              </div>
+          <div>
+            <label className="block mb-1 text-sm font-medium">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <span className="absolute top-3 left-3 text-gray-400">
+                <FaLock />
+              </span>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none text-sm"
+              />
             </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary-dark transition font-medium"
-            >
-              {loading ? 'Resetting...' : 'Reset Password'}
-            </button>
-          </form>
-        )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary-dark transition font-medium"
+          >
+            {loading ? "Resetting..." : "Reset Password"}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center text-sm text-gray-600">
+          <Link href="/login" className="text-primary hover:underline">
+            ← Back to login
+          </Link>
+        </div>
       </motion.div>
     </div>
   );
