@@ -15,6 +15,8 @@ import {
   FaKey,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { useAuth  } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: <FaTachometerAlt /> },
@@ -33,7 +35,9 @@ export default function DashboardChildLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+
+  const {auth, logout} = useAuth();
+ const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -48,6 +52,12 @@ export default function DashboardChildLayout({
   };
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+  const router  = useRouter();
+  const handleLogout = () => {
+    logout();
+    router.push("/")
+  }
 
   return (
     <div className="min-h-screen flex bg-gray-100 text-gray-800">
@@ -131,7 +141,7 @@ export default function DashboardChildLayout({
             onMouseLeave={handleMouseLeave}
           >
             <div className="text-sm text-gray-700 flex items-center gap-2 cursor-pointer hover:text-primary transition">
-              Welcome, Admin
+              Welcome, {auth?.adminFirstName}
               <FaUserCircle className="text-lg" />
             </div>
 
@@ -160,7 +170,7 @@ export default function DashboardChildLayout({
                 </Link>
                 <Link
                   href="/"
-                  onClick={() => alert("Logging out...")}
+                  onClick={handleLogout}
                   className="w-full text-left flex items-center px-4 py-3 hover:bg-gray-50 text-sm text-red-600 transition"
                 >
                   <FaSignOutAlt className="mr-2" />

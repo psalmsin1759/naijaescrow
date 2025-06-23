@@ -18,6 +18,7 @@ export interface BusinessResponse {
   success: boolean;
   message: string;
   data?: Business;
+  token?: string;
 }
 
 export const createBusiness = async (
@@ -41,7 +42,8 @@ export const createBusiness = async (
     return {
       success: true,
       message: "Business created successfully",
-      data: data.business,
+      data: data.data,
+      token: data.token
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

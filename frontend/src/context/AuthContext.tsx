@@ -1,4 +1,3 @@
-
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
@@ -20,18 +19,24 @@ interface AuthData {
 
 interface AuthContextType {
   auth: AuthData | null;
+  authLoading: boolean;
   setAuth: (data: AuthData) => void;
   logout: () => void;
 }
+
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [auth, setAuthState] = useState<AuthData | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     const stored = localStorage.getItem('naijaescrow-auth');
-    if (stored) setAuthState(JSON.parse(stored));
+    if (stored) {
+      setAuthState(JSON.parse(stored));
+    }
+    setAuthLoading(false); 
   }, []);
 
   const setAuth = (data: AuthData) => {
@@ -45,11 +50,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ auth, setAuth, logout }}>
+    <AuthContext.Provider value={{ auth, setAuth, logout, authLoading }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

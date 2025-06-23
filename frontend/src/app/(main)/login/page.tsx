@@ -25,15 +25,18 @@ export default function LoginPage() {
     try {
       if (email && password) {
         const res = await login(email, password);
-
+        
         if (res.success) {
+          //console.log (res);
           const authData = {
             adminFirstName: res?.data?.firstName,
             adminLastName: res?.data?.lastName,
             adminEmail: res?.data?.email,
             adminPhone: res?.data?.phone,
+            token: res.token
           };
 
+          console.log (authData);
           setAuth(authData);
           toast.success("Login successfully");
           router.push("/dashboard");

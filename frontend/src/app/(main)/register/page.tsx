@@ -49,7 +49,8 @@ function RegisterSteps({
       const res = await createBusinessWithAdmin(payload);
 
       if (res.success) {
-       const authData  = {...data}
+       const authData  = {...data, token: res.token}
+      
         setAuth(authData);
         toast.success("Business created successfully");
         setStep(4);

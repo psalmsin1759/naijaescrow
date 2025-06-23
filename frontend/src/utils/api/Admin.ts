@@ -12,6 +12,7 @@ export interface AdminResponse {
   success: boolean;
   message: string;
   data?: Admin;
+  token?: string;
 }
 
 
@@ -37,6 +38,8 @@ export const login = async (
     return {
       success: true,
       message: data.message || "Login successfully",
+      data: data.data,
+      token: data.token
     };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
