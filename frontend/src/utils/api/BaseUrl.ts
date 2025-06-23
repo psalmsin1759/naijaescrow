@@ -1,0 +1,1 @@
+export const baseUrl = "https://userservice.qnetixtechnologies.com/api/";

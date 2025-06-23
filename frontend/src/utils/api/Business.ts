@@ -1,6 +1,7 @@
 import {FormData} from "@/context/FormContext";
+import {baseUrl} from "@/utils/api/BaseUrl";
 
-export const baseUrl = "https://userservice.qnetixtechnologies.com/api/";
+
 
 
 export interface Business {
@@ -183,3 +184,5 @@ export const sendWelcomeEmail = async (
     };
   }
 };
+
+

@@ -1,28 +1,52 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { FaLock, FaEnvelope } from 'react-icons/fa';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { FaLock, FaEnvelope } from "react-icons/fa";
+import Link from "next/link";
+import { login } from "@/utils/api/Admin";
+import { toast } from "react-toastify";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const { setAuth } = useAuth();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setLoading(true);
+
     try {
       if (email && password) {
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 1000);
+        const res = await login(email, password);
+
+        if (res.success) {
+          const authData = {
+            adminFirstName: res?.data?.firstName,
+            adminLastName: res?.data?.lastName,
+            adminEmail: res?.data?.email,
+            adminPhone: res?.data?.phone,
+          };
+
+          setAuth(authData);
+          toast.success("Login successfully");
+          router.push("/dashboard");
+        } else {
+          toast.error(res.message || "Something went wrong");
+        }
+      } else {
+        toast.success("Please enter all fields");
       }
-    } catch (error) {
-      console.error('Login failed', error);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error.message || "Server error occurred");
     } finally {
       setLoading(false);
     }
@@ -77,7 +101,10 @@ export default function LoginPage() {
               />
             </div>
             <div className="text-right mt-1">
-              <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+              <Link
+                href="/forgot-password"
+                className="text-xs text-primary hover:underline"
+              >
                 Forgot password?
               </Link>
             </div>
@@ -88,13 +115,16 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary-dark transition font-medium"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          Don’t have an account?{' '}
-          <Link href="/register" className="text-primary font-medium hover:underline">
+          Don’t have an account?{" "}
+          <Link
+            href="/register"
+            className="text-primary font-medium hover:underline"
+          >
             Register
           </Link>
         </div>
