@@ -1,70 +1,71 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaUserSlash, FaTrash, FaPlus } from 'react-icons/fa';
-
-interface Admin {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  status: 'active' | 'disabled';
-}
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { FaUserSlash, FaTrash, FaPlus } from "react-icons/fa";
+import {
+  getAdminsByBusiness,
+  Admin,
+  deleteAdmin,
+} from "@/utils/api/Admin";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
+import AddAdminForm from "@/components/AddAdminForm";
 
 export default function AdminsPage() {
-  const [admins, setAdmins] = useState<Admin[]>([
-    {
-      id: '1',
-      name: 'Jane Doe',
-      email: 'jane@example.com',
-      phone: '08012345678',
-      status: 'active',
-    },
-    {
-      id: '2',
-      name: 'John Smith',
-      email: 'john@example.com',
-      phone: '08098765432',
-      status: 'disabled',
-    },
-  ]);
-
+  const [admins, setAdmins] = useState<Admin[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDisableModal, setShowDisableModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
 
+  const { auth } = useAuth();
+
+  useEffect(() => {
+    if (auth?.business) {
+      fetchAdmins();
+    }
+  }, [auth?.business]);
+
+  const fetchAdmins = async () => {
+    if (!auth?.business) return toast.error("Unauthorized");
+
+    try {
+      const res = await getAdminsByBusiness(auth.business);
+      if (res.success) {
+        setAdmins(res.data!);
+      } else {
+        toast.error(res.message || "Something went wrong");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error.message || "Server error occurred");
+    }
+  };
+
   const handleDisable = () => {
     if (selectedAdmin) {
       setAdmins((prev) =>
         prev.map((admin) =>
-          admin.id === selectedAdmin.id ? { ...admin, status: 'disabled' } : admin
+          admin._id === selectedAdmin._id
+            ? { ...admin, isActive: false }
+            : admin
         )
       );
     }
     setShowDisableModal(false);
   };
 
-  const handleDelete = () => {
-    if (selectedAdmin) {
-      setAdmins((prev) => prev.filter((admin) => admin.id !== selectedAdmin.id));
+  const handleDelete = async () => {
+    if (!selectedAdmin) return;
+    try {
+      await deleteAdmin(selectedAdmin._id!);
+      fetchAdmins();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error.message || "Error deleting admin");
     }
     setShowDeleteModal(false);
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleAddAdmin = (e: any) => {
-    e.preventDefault();
-    const newAdmin: Admin = {
-      id: (admins.length + 1).toString(),
-      name: e.target.name.value,
-      email: e.target.email.value,
-      phone: e.target.phone.value,
-      status: 'active',
-    };
-    setAdmins((prev) => [...prev, newAdmin]);
-    setShowAddModal(false);
   };
 
   return (
@@ -75,8 +76,7 @@ export default function AdminsPage() {
           onClick={() => setShowAddModal(true)}
           className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark"
         >
-          <FaPlus />
-          Add Admin
+          <FaPlus /> Add Admin
         </button>
       </div>
 
@@ -87,19 +87,25 @@ export default function AdminsPage() {
               <th className="p-4">Name</th>
               <th className="p-4">Email</th>
               <th className="p-4">Phone</th>
+              <th className="p-4">Role</th>
               <th className="p-4">Status</th>
               <th className="p-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {admins.map((admin) => (
-              <tr key={admin.id} className="border-t">
-                <td className="p-4">{admin.name}</td>
+              <tr key={admin._id} className="border-t">
+                <td className="p-4">
+                  {admin.firstName} {admin.lastName}
+                </td>
                 <td className="p-4">{admin.email}</td>
                 <td className="p-4">{admin.phone}</td>
-                <td className="p-4 capitalize">{admin.status}</td>
+                <td className="p-4">{admin.role}</td>
+                <td className="p-4">
+                  {admin.isActive ? "Active" : "Disabled"}
+                </td>
                 <td className="p-4 text-right space-x-2">
-                  {admin.status === 'active' && (
+                  {admin.isActive && (
                     <button
                       onClick={() => {
                         setSelectedAdmin(admin);
@@ -133,33 +139,14 @@ export default function AdminsPage() {
         </table>
       </div>
 
-      {/* Add Admin Modal */}
       {showAddModal && (
         <Modal title="Add New Admin" onClose={() => setShowAddModal(false)}>
-          <form className="space-y-4" onSubmit={handleAddAdmin}>
-            <input
-              name="name"
-              required
-              placeholder="Full Name"
-              className="w-full p-2 border rounded"
-            />
-            <input
-              name="email"
-              type="email"
-              required
-              placeholder="Email"
-              className="w-full p-2 border rounded"
-            />
-            <input
-              name="phone"
-              required
-              placeholder="Phone"
-              className="w-full p-2 border rounded"
-            />
-            <button type="submit" className="bg-primary text-white px-4 py-2 rounded">
-              Add Admin
-            </button>
-          </form>
+          <AddAdminForm
+            onSuccess={() => {
+              setShowAddModal(false);
+              fetchAdmins();
+            }}
+          />
         </Modal>
       )}
 
@@ -167,7 +154,11 @@ export default function AdminsPage() {
       {showDisableModal && selectedAdmin && (
         <Modal title="Disable Admin" onClose={() => setShowDisableModal(false)}>
           <p className="text-sm text-gray-700 mb-4">
-            Are you sure you want to disable <strong>{selectedAdmin.name}</strong>?
+            Are you sure you want to disable{" "}
+            <strong>
+              {selectedAdmin.firstName} {selectedAdmin.lastName}
+            </strong>
+            ?
           </p>
           <div className="flex justify-end gap-4">
             <button
@@ -190,7 +181,11 @@ export default function AdminsPage() {
       {showDeleteModal && selectedAdmin && (
         <Modal title="Delete Admin" onClose={() => setShowDeleteModal(false)}>
           <p className="text-sm text-gray-700 mb-4">
-            Are you sure you want to permanently delete <strong>{selectedAdmin.name}</strong>?
+            Are you sure you want to permanently delete{" "}
+            <strong>
+              {selectedAdmin.firstName} {selectedAdmin.lastName}
+            </strong>
+            ?
           </p>
           <div className="flex justify-end gap-4">
             <button
@@ -212,7 +207,6 @@ export default function AdminsPage() {
   );
 }
 
-/** Reusable Modal Component */
 function Modal({
   title,
   onClose,

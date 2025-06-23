@@ -29,10 +29,12 @@ export default function LoginPage() {
         if (res.success) {
           //console.log (res);
           const authData = {
+            _id: res?.data?._id,
             adminFirstName: res?.data?.firstName,
             adminLastName: res?.data?.lastName,
             adminEmail: res?.data?.email,
             adminPhone: res?.data?.phone,
+            business: res?.data?.business,
             token: res.token
           };
 

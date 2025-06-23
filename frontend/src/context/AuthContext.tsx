@@ -1,8 +1,14 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
-interface AuthData {
+export interface AuthData {
   token?: string;
   _id?: string;
   businessName?: string;
@@ -15,15 +21,15 @@ interface AuthData {
   adminLastName?: string;
   adminEmail?: string;
   adminPhone?: string;
+  business?: string;
 }
 
 interface AuthContextType {
   auth: AuthData | null;
   authLoading: boolean;
-  setAuth: (data: AuthData) => void;
+  setAuth: (data: AuthData | ((prev: AuthData | null) => AuthData)) => void;
   logout: () => void;
 }
-
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -32,20 +38,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem('naijaescrow-auth');
+    const stored = localStorage.getItem("naijaescrow-auth");
     if (stored) {
       setAuthState(JSON.parse(stored));
     }
-    setAuthLoading(false); 
+    setAuthLoading(false);
   }, []);
 
-  const setAuth = (data: AuthData) => {
-    setAuthState(data);
-    localStorage.setItem('naijaescrow-auth', JSON.stringify(data));
+  const setAuth = (data: AuthData | ((prev: AuthData | null) => AuthData)) => {
+    setAuthState((prev) => {
+      const updated = typeof data === "function" ? data(prev) : data;
+      localStorage.setItem("naijaescrow-auth", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const logout = () => {
-    localStorage.removeItem('naijaescrow-auth');
+    localStorage.removeItem("naijaescrow-auth");
     setAuthState(null);
   };
 
@@ -56,9 +65,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };

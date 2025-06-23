@@ -17,6 +17,7 @@ import {
 } from "react-icons/fa";
 import { useAuth  } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { ToastContainer } from "react-toastify";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: <FaTachometerAlt /> },
@@ -189,6 +190,7 @@ export default function DashboardChildLayout({
           Naija Escrow &copy; {new Date().getFullYear()} — All rights reserved.
         </footer>
       </div>
+      <ToastContainer />
     </div>
   );
 }
