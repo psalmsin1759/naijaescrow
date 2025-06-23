@@ -204,6 +204,40 @@ export const updateAdmin = async (
   }
 };
 
+export const changePassword = async (
+  id: string,
+  currentPassword: string,
+  newPassword: string
+): Promise<AdminResponse> => {
+  try {
+    const res = await fetch(`${baseUrl}admins/change-password/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({currentPassword, newPassword}),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to change");
+    }
+
+    const data = await res.json();
+    return {
+      success: true,
+      message: data.message || "Update successfully",
+      data: data.data,
+    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Unknown error occurred",
+    };
+  }
+};
+
 
 export const getAdminsByBusiness = async (
   businessId: string

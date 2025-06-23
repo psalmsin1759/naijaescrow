@@ -2,8 +2,13 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { toast } from 'react-toastify';
+import { changePassword } from '@/utils/api/Admin';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ChangePasswordPage() {
+  const { auth } = useAuth();
+
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -11,7 +16,7 @@ export default function ChangePasswordPage() {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -22,11 +27,12 @@ export default function ChangePasswordPage() {
     if (!formData.currentPassword) newErrors.currentPassword = 'Current password is required';
     if (!formData.newPassword) newErrors.newPassword = 'New password is required';
     if (formData.newPassword.length < 6) newErrors.newPassword = 'Password must be at least 6 characters';
-    if (formData.newPassword !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    if (formData.newPassword !== formData.confirmPassword)
+      newErrors.confirmPassword = 'Passwords do not match';
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -34,10 +40,31 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    console.log('Change password request:', formData);
-    setSuccess(true);
-    setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    setTimeout(() => setSuccess(false), 4000);
+    if (!auth?._id) return toast.error("Unauthorized");
+
+    setLoading(true);
+    setErrors({});
+
+    try {
+      console.log (auth._id + " " +formData.newPassword + " "  +formData.confirmPassword)
+      const res = await changePassword(auth._id, formData.currentPassword, formData.confirmPassword);
+      console.log (res);
+      if (res.success) {
+        toast.success(res.message);
+        setFormData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+      } else {
+        toast.error(res.message || 'Failed to update password');
+      }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      toast.error('Server error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -92,21 +119,14 @@ export default function ChangePasswordPage() {
         <div className="pt-4">
           <button
             type="submit"
-            className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-md transition duration-300"
+            disabled={loading}
+            className={`bg-primary text-white px-6 py-2 rounded-md transition duration-300 ${
+              loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'
+            }`}
           >
-            Update Password
+            {loading ? 'Updating...' : 'Update Password'}
           </button>
         </div>
-
-        {success && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-green-600 text-sm pt-3"
-          >
-            Password updated successfully!
-          </motion.p>
-        )}
       </form>
     </motion.div>
   );
