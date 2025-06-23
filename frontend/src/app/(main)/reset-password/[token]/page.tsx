@@ -1,5 +1,6 @@
-"use client";
+'use client';
 
+import { useParams } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaLock } from "react-icons/fa";
@@ -7,12 +8,8 @@ import { resetPassword } from "@/utils/api/Admin";
 import { toast } from "react-toastify";
 import Link from "next/link";
 
-export default function ResetPasswordPage({
-  params,
-}: {
-  params: { token: string };
-}) {
-  const token = params.token;
+export default function ResetPasswordPage() {
+  const { token } = useParams<{ token: string }>();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,23 +18,22 @@ export default function ResetPasswordPage({
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log(token);
-    console.log(password);
+
     try {
-      if (password === confirmPassword) {
-        const res = await resetPassword(token!, password);
-        if (res.success) {
-          toast.success(res.message);
-          setPassword("");
-          setConfirmPassword("");
-        } else {
-          toast.error(res.message || "Something went wrong");
-        }
-      } else {
+      if (password !== confirmPassword) {
         toast.error("Password mismatch");
+        return;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res = await resetPassword(token, password);
+      if (res.success) {
+        toast.success(res.message);
+        setPassword("");
+        setConfirmPassword("");
+      } else {
+        toast.error(res.message || "Something went wrong");
+      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message || "Server error occurred");
     } finally {
