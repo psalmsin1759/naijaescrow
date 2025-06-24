@@ -251,3 +251,37 @@ export const cancelOrder = async (
     };
   }
 };
+
+
+export const updateOrder = async (
+  id: string,
+  payload: Partial<Order>
+): Promise<OrderResponse> => {
+  try {
+    const res = await fetch(`${orderBaseUrl}orders/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to upload");
+    }
+
+    const data = await res.json();
+    return {
+      success: true,
+      message: data.message || "Update successfully",
+      data: data.data,
+    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Unknown error occurred",
+    };
+  }
+};

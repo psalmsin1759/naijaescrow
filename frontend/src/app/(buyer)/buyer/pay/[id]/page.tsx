@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { FaLock } from "react-icons/fa";
 import dynamic from "next/dynamic";
-import { getOrdersById, Order, changeOrderStatus } from "@/utils/api/Order";
+import { getOrdersById, Order, changeOrderStatus, updateOrder } from "@/utils/api/Order";
 import { getBusinessById, Business } from "@/utils/api/Business";
 
 const PaystackButton = dynamic(
@@ -23,6 +23,14 @@ export default function PayPage() {
 
   const router = useRouter();
 
+    const checkOrderStatusAndRedirect = (order: Order) => {
+  const redirectStatuses = ["paid", "shipped", "delivered"];
+
+  if (redirectStatuses.includes(order.status)) {
+    router.push(`/buyer/paid/${order._id}`);
+  }
+};
+
   const fetchOrderById = async (id: string) => {
     const res = await getOrdersById(id);
     checkOrderStatusAndRedirect(res.data!)
@@ -33,18 +41,20 @@ export default function PayPage() {
   };
 
 
+  const handUpdateOrder = async(email: string, phone: string) => {
+    const updateValue = {
+      buyerEmail: email,
+      buyerPhone: phone,
+    }
+    await updateOrder(id, updateValue);
+  }
+
 
   useEffect(() => {
     fetchOrderById(id);
   }, [id]);
 
-  const checkOrderStatusAndRedirect = (order: Order) => {
-  const redirectStatuses = ["paid", "shipped", "delivered"];
 
-  if (redirectStatuses.includes(order.status)) {
-    router.push(`/buyer/paid/${order._id}`);
-  }
-};
 
   const changeOrderStatusToPaid = async () => {
     await changeOrderStatus(id, "paid");
@@ -81,6 +91,7 @@ export default function PayPage() {
     onSuccess: (paymentData: any) => {
       console.log("Payment Success:", paymentData);
       changeOrderStatusToPaid()
+      handUpdateOrder(email, phone);
       router.push(`/buyer/paid/${id}`);
     },
     onClose: () => alert("Payment cancelled"),

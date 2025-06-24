@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaCheckCircle, FaCopy } from 'react-icons/fa';
 import {getOrdersById, Order} from "@/utils/api/Order";
+import Link from "next/link";
 
 export default function OrderSuccessPage() {
  const { id } = useParams<{ id: string }>();
@@ -90,14 +91,14 @@ export default function OrderSuccessPage() {
             )}
           </button>
         </div>
-        <a
-          href={paymentLink}
+        <Link
+          href={`/buyer/pay/${order._id}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block mt-4 text-sm text-primary hover:underline"
         >
           ➜ View payment page
-        </a>
+        </Link>
       </div>
     </motion.div>
   );
