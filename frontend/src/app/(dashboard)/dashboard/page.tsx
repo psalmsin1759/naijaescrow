@@ -10,17 +10,13 @@ import {
   FaPlus,
 } from "react-icons/fa";
 import Modal from "@/components/ui/Modal";
-import { useRouter } from "next/navigation";
+import CreateOrderForm from "@/components/orders/CreateOrderForm";
 export default function DashboardPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const router = useRouter();
 
-  const handleSubmit = async () => {
-    //const newOrder = await createOrder(formData);
 
-    router.push(`/dashboard/orders/success/1224}`);
-  };
+  
 
   return (
     <motion.div
@@ -157,78 +153,7 @@ export default function DashboardPage() {
           onClose={() => setShowCreateModal(false)}
           title="Create New Order"
         >
-          <form className="space-y-4 text-sm text-gray-700">
-            <div>
-              <label className="block mb-1 font-medium">Customer Name</label>
-              <input
-                placeholder="e.g. John Doe"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block mb-1 font-medium">Phone Number</label>
-                <input
-                  placeholder="e.g. 08012345678"
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-medium">Email</label>
-                <input
-                  type="email"
-                  placeholder="e.g. customer@example.com"
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium">Order Item</label>
-              <input
-                placeholder="e.g. Apple MacBook Pro"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium">Item Description</label>
-              <textarea
-                placeholder="Short description of the item"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-                rows={3}
-              ></textarea>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block mb-1 font-medium">Amount (₦)</label>
-                <input
-                  placeholder="e.g. 200000"
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-medium">
-                  Delivery Fee (₦)
-                </label>
-                <input
-                  placeholder="e.g. 5000"
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <button
-                onClick={handleSubmit}
-                className="w-full bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-md font-medium transition-all duration-300"
-              >
-                Submit Order
-              </button>
-            </div>
-          </form>
+          <CreateOrderForm />
         </Modal>
       </>
     </motion.div>
