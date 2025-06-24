@@ -6,6 +6,8 @@
   --color-secondary: #FFC107;
 }
 
+
+
 .btn {
   @apply inline-flex items-center justify-center rounded px-5 py-2 font-semibold shadow transition;
 }

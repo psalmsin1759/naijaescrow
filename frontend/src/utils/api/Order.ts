@@ -15,6 +15,7 @@ export interface Order {
   buyerEmail: string;
   buyerPhone?: string;
   businessId: string;
+  sellerEmail: string;
   amount: number;
   deliveryFee: number;
   status: string;

@@ -15,7 +15,7 @@ import {
   FaKey,
   FaSignOutAlt,
 } from "react-icons/fa";
-import { useAuth  } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 
@@ -36,9 +36,8 @@ export default function DashboardChildLayout({
 }: {
   children: React.ReactNode;
 }) {
-
-  const {auth, logout} = useAuth();
- const pathname = usePathname();
+  const { auth, logout } = useAuth();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,11 +53,11 @@ export default function DashboardChildLayout({
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  const router  = useRouter();
+  const router = useRouter();
   const handleLogout = () => {
     logout();
-    router.push("/")
-  }
+    router.push("/");
+  };
 
   return (
     <div className="min-h-screen flex bg-gray-100 text-gray-800">
@@ -155,7 +154,7 @@ export default function DashboardChildLayout({
                   <FaUserCircle className="mr-2 text-primary" />
                   Profile
                 </Link>
-                 <Link
+                <Link
                   href="/dashboard/admins"
                   className="flex items-center px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 transition"
                 >
@@ -183,7 +182,9 @@ export default function DashboardChildLayout({
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-screen-lg w-full mx-auto">{children}</div>
+        </main>
 
         {/* Footer */}
         <footer className="bg-white text-center py-3 text-sm text-gray-500 shadow-inner">

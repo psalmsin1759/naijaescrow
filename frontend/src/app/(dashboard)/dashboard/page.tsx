@@ -22,47 +22,51 @@ import { useAuth } from "@/context/AuthContext";
 export default function DashboardPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-   const [orders, setOrders] = useState<Order[]>([]);
-    const [stats, setStats] = useState<Stats>({
-      total: 0,
-      pending: 0,
-      completed: 0,
-      cancelled: 0,
-    });
-  
-    const { auth } = useAuth();
-    const businessId = auth?.business;
-  
-    const fetchOrdersAndStats = async () => {
-      const res = await getOrdersByBusinessId(businessId!);
-      if (res.success && res.data) setOrders(res.data);
-  
-      const statsRes = await getBusinessOrderStats(businessId!);
-      setStats(statsRes.data!);
-    };
-    useEffect(() => {
-      if (!businessId) return;
-  
-      fetchOrdersAndStats();
-    }, [businessId]);
-  
-     const statusColors: Record<string, string> = {
-  released: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-  pending: "bg-amber-50 text-amber-700 border border-amber-200",
-  shipped: "bg-sky-50 text-sky-700 border border-sky-200",
-  delivered: "bg-indigo-50 text-indigo-700 border border-indigo-200",
-  paid: "bg-blue-50 text-blue-700 border border-blue-200",
-  cancelled: "bg-rose-50 text-rose-700 border border-rose-200",
-  default: "bg-gray-50 text-gray-700 border border-gray-200",
-};
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [stats, setStats] = useState<Stats>({
+    total: 0,
+    pending: 0,
+    completed: 0,
+    cancelled: 0,
+  });
+
+  const { auth } = useAuth();
+  const businessId = auth?.business;
+
+  const fetchOrdersAndStats = async () => {
+    const res = await getOrdersByBusinessId(businessId!);
+    if (res.success && res.data) setOrders(res.data);
+
+    const statsRes = await getBusinessOrderStats(businessId!);
+    setStats(statsRes.data!);
+  };
+  useEffect(() => {
+    if (!businessId) return;
+
+    fetchOrdersAndStats();
+  }, [businessId]);
+
+  const statusColors: Record<string, string> = {
+    released: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    pending: "bg-amber-50 text-amber-700 border border-amber-200",
+    shipped: "bg-sky-50 text-sky-700 border border-sky-200",
+    delivered: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+    paid: "bg-blue-50 text-blue-700 border border-blue-200",
+    cancelled: "bg-rose-50 text-rose-700 border border-rose-200",
+    default: "bg-gray-50 text-gray-700 border border-gray-200",
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="space-y-8"
+      className="space-y-8 w-full flex flex-col"
     >
+
+      <div className="max-w-screen-xl mx-auto px-4 w-full">
+    {/* === Everything else on the page goes here === */}
+  </div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
           {
@@ -124,51 +128,52 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Orders Table */}
-      <>
-        <div className="w-full overflow-x-auto bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
-          <div className="min-w-full sm:min-w-[640px]">
-            <table className=" w-full text-sm text-left">
-              <thead className="bg-gray-100 text-gray-600">
-                <tr>
-                  <th className="py-2 px-4">Order ID</th>
-                  <th className="py-2 px-4">Buyer</th>
-                  <th className="py-2 px-4">Amount</th>
-                  <th className="py-2 px-4">Status</th>
-                  <th className="py-2 px-4">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((order, index) => (
-                  <tr key={index} className="border-t hover:bg-gray-50">
-                    <td className="py-2 px-4 font-medium">{order._id}</td>
-                    <td className="py-2 px-4">{order.buyerName}</td>
-                    <td className="py-2 px-4">{order.amount}</td>
-                    <td className="py-2 px-4">
-                      <span
-                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      statusColors[order.status] || statusColors.default
-                    }`}
-                  >
-                    {order.status.charAt(0).toUpperCase() +
-                      order.status.slice(1)}
-                  </span>
-                    </td>
-                    <td className="py-2 px-4">{order.createdAt}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <Modal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          title="Create New Order"
-        >
-          <CreateOrderForm />
-        </Modal>
-      </>
+
+     <div className="overflow-x-auto bg-white shadow rounded-lg p-6">
+  <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
+
+  <table className="table-auto min-w-full text-sm text-left">
+    <thead className="bg-gray-100 text-gray-600">
+      <tr>
+        <th className="py-2 px-4 whitespace-nowrap">Order ID</th>
+        <th className="py-2 px-4 whitespace-nowrap">Buyer</th>
+        <th className="py-2 px-4 whitespace-nowrap">Amount</th>
+        <th className="py-2 px-4 whitespace-nowrap">Status</th>
+        <th className="py-2 px-4 whitespace-nowrap">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {orders.map((order, index) => (
+        <tr key={index} className="border-t hover:bg-gray-50">
+          <td className="py-2 px-4 font-medium max-w-[200px] truncate">
+            {order._id}
+          </td>
+          <td className="py-2 px-4 max-w-[150px] truncate">{order.buyerName}</td>
+          <td className="py-2 px-4 whitespace-nowrap">{order.amount}</td>
+          <td className="py-2 px-4">
+            <span
+              className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                statusColors[order.status] || statusColors.default
+              }`}
+            >
+              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+            </span>
+          </td>
+          <td className="py-2 px-4 whitespace-nowrap">{order.createdAt}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+
+       <Modal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        title="Create New Order"
+      >
+        <CreateOrderForm />
+      </Modal> 
     </motion.div>
   );
 }

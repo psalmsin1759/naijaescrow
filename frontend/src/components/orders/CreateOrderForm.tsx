@@ -37,6 +37,7 @@ export default function CreateOrderForm() {
 
     const payload = {
       buyerName: form.buyerName,
+      sellerEmail: auth.adminEmail,
       //buyerEmail: form.buyerEmail,
       //buyerPhone: form.buyerPhone,
       product: {
