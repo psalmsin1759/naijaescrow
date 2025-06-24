@@ -19,9 +19,11 @@ import {
 } from "@/utils/api/Order";
 import { useAuth } from "@/context/AuthContext";
 
+import {getWallet} from "@/utils/api/Wallet";
+
 export default function DashboardPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
-
+  const [wallet, setWallet] = useState(0);
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<Stats>({
     total: 0,
@@ -33,19 +35,28 @@ export default function DashboardPage() {
   const { auth } = useAuth();
   const businessId = auth?.business;
 
-  const fetchOrdersAndStats = async () => {
+  const fetchOrdersAndStats = async (businessId: string) => {
     const res = await getOrdersByBusinessId(businessId!);
     if (res.success && res.data) setOrders(res.data);
 
     const statsRes = await getBusinessOrderStats(businessId!);
     setStats(statsRes.data!);
   };
+
+  const fetchWallet = async (businessId: string) => {
+    const res = await getWallet(businessId);
+    console.log(res);
+    if (res.success) setWallet(res.data!.balance!)
+   
+  }
+
   useEffect(() => {
     if (!businessId) return;
-
-    fetchOrdersAndStats();
+    fetchWallet(businessId)
+    fetchOrdersAndStats(businessId);
   }, [businessId]);
 
+  
   const statusColors: Record<string, string> = {
     released: "bg-emerald-50 text-emerald-700 border border-emerald-200",
     pending: "bg-amber-50 text-amber-700 border border-amber-200",
@@ -71,29 +82,29 @@ export default function DashboardPage() {
         {[
           {
             title: "Total Transactions",
-            value: "₦12,500",
+            value: "₦0",
             desc: "All-time transactions",
             icon: <FaExchangeAlt />,
             color: "bg-blue-100 text-blue-800",
           },
           {
             title: "Wallet Balance",
-            value: "₦150,000",
+            value: `₦${wallet}`,
             desc: "Available funds",
             icon: <FaWallet />,
             color: "bg-green-100 text-green-800",
           },
           {
-            title: "Pending Transactions",
+            title: "Pending Orders",
             value: stats.pending,
             desc: "Awaiting confirmation",
             icon: <FaClock />,
             color: "bg-yellow-100 text-yellow-800",
           },
           {
-            title: "Completed Transactions",
+            title: "Completed Orders",
             value: stats.completed,
-            desc: "Successfully processed",
+            desc: "Successfully completed",
             icon: <FaCheckCircle />,
             color: "bg-purple-100 text-purple-800",
           },

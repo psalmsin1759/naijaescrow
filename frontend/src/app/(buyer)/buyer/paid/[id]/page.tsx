@@ -15,12 +15,14 @@ import { getOrdersById, Order, changeOrderStatus } from "@/utils/api/Order";
 import { getBusinessById, Business } from "@/utils/api/Business";
 import Modal from "@/components/ui/Modal";
 import { toast } from "react-toastify";
+import { creditWallet } from "@/utils/api/Wallet";
 
 type OrderStatus = "paid" | "shipped" | "released";
 
 export default function PaymentSuccessPage() {
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<Order | null>(null);
+  const [businessId, setBusinessId] = useState("");
   const [business, setBusiness] = useState<Business | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -28,6 +30,7 @@ export default function PaymentSuccessPage() {
     const res = await getOrdersById(id);
 
     setOrder(res.data!);
+    setBusinessId(res.data!.businessId);
     const resBiz = await getBusinessById(res.data!.businessId);
     setBusiness(resBiz.data!);
   };
@@ -64,10 +67,36 @@ export default function PaymentSuccessPage() {
     (s) => s.key === order.status
   );
 
+  const fundWallet = async (amount: number, reference: string, name: string) => {
+    const input = {
+      userId: businessId,
+      amount: amount,
+      reference: reference,
+      narration: `Payment from ${name}`,
+      source: "order",
+      type: "business",
+    };
+
+    await creditWallet(input);
+
+  };
+
+  function generateRandomId(length = 12): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+
   const changeStatusToComplete = async () => {
+    const reference = generateRandomId(12);
     const res = await changeOrderStatus(order._id!, "released");
     if (res.success && res.data) {
       setOrder(res.data);
+      fundWallet(total,reference, order.buyerName );
       toast.success("Trade completed!!");
     }
   };

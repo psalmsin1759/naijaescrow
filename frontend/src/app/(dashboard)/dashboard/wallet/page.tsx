@@ -1,26 +1,53 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Modal from '@/components/ui/Modal';
 import { FaWallet, FaMoneyBillWave } from 'react-icons/fa';
+import {getWallet, getTotalWithdrawn, getTransactions, WalletTransaction} from "@/utils/api/Wallet";
+import { useAuth } from '@/context/AuthContext';
 
 export default function WalletPage() {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [banks] = useState(['Access Bank', 'GTBank', 'Zenith Bank', 'UBA']);
   const [selectedBank, setSelectedBank] = useState('');
   const [accountName] = useState('Samson Ude');
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
 
-  const walletData = {
-    total: 350000,
-    withdrawn: 150000,
-  };
+  const { auth } = useAuth();
+  const businessId = auth?.business;
 
-  const walletHistory = [
-    { date: '2024-06-01', type: 'Credit', amount: 200000, description: 'Order #001' },
-    { date: '2024-06-05', type: 'Debit', amount: 50000, description: 'Withdrawal to UBA' },
-    { date: '2024-06-10', type: 'Credit', amount: 150000, description: 'Order #004' },
-  ];
+  const [wallet, setWallet] = useState(0);
+  const [totalWithdrawn, setTotalWithdrawn] = useState(0);
+
+  
+
+
+
+ useEffect(() => {
+    if (!businessId) return;
+    fetchWallet(businessId)
+    fetchTotalWithdrawn(businessId);
+    fetchTransactions(businessId);
+  }, [businessId]);
+
+
+  const fetchWallet = async (businessId: string) => {
+    const res = await getWallet(businessId);
+    setWallet(res.data!.balance!)
+
+  }
+
+  const fetchTotalWithdrawn = async (businessId: string) => {
+    const res = await getTotalWithdrawn(businessId)
+    setTotalWithdrawn(res.data!)
+  }
+
+  const fetchTransactions = async (businessId: string) => {
+    const res = await getTransactions(businessId)
+    setTransactions(res.data!)
+  }
+
 
   return (
     <motion.div
@@ -39,14 +66,14 @@ export default function WalletPage() {
         <div className="bg-gradient-to-r from-green-100 to-green-200 p-5 rounded-lg shadow flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-700">Total in Wallet</p>
-            <h3 className="text-2xl font-bold text-green-800">₦{walletData.total.toLocaleString()}</h3>
+            <h3 className="text-2xl font-bold text-green-800">₦{wallet}</h3>
           </div>
           <FaWallet className="text-3xl text-green-700" />
         </div>
         <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-5 rounded-lg shadow flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-700">Total Withdrawn</p>
-            <h3 className="text-2xl font-bold text-blue-800">₦{walletData.withdrawn.toLocaleString()}</h3>
+            <h3 className="text-2xl font-bold text-blue-800">₦{totalWithdrawn}</h3>
           </div>
           <FaMoneyBillWave className="text-3xl text-blue-700" />
         </div>
@@ -83,14 +110,14 @@ export default function WalletPage() {
             </tr>
           </thead>
           <tbody>
-            {walletHistory.map((entry, index) => (
+            {transactions.map((transaction, index) => (
               <tr key={index} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3">{entry.date}</td>
-                <td className="px-4 py-3">{entry.type}</td>
-                <td className={`px-4 py-3 font-semibold ${entry.type === 'Credit' ? 'text-green-600' : 'text-red-500'}`}>
-                  ₦{entry.amount.toLocaleString()}
+                <td className="px-4 py-3">{transaction.createdAt}</td>
+                <td className="px-4 py-3">{transaction.type}</td>
+                <td className={`px-4 py-3 font-semibold ${transaction.type === 'credit' ? 'text-green-600' : 'text-red-500'}`}>
+                  ₦{transaction.amount.toLocaleString()}
                 </td>
-                <td className="px-4 py-3">{entry.description}</td>
+                <td className="px-4 py-3">{transaction.narration}</td>
               </tr>
             ))}
           </tbody>
