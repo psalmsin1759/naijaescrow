@@ -4,32 +4,25 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaCheckCircle, FaCopy } from 'react-icons/fa';
-import {Order} from "@/app/(dashboard)/dashboard/orders/page";
+import {getOrdersById, Order} from "@/utils/api/Order";
 
 export default function OrderSuccessPage() {
-  const { id } = useParams();
+ const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const fetchOrderById = async (id: string) => {
+    const res = await  getOrdersById(id);
+    setOrder(res.data!);
+  }
+
   useEffect(() => {
-    const mockOrder : Order = {
-      id: id as string,
-      customer: 'John Doe',
-      email: 'john@example.com',
-      phone: '08012345678',
-      item: 'MacBook Pro',
-      description: "",
-      amount: "350000",
-      deliveryFee: "5000",
-      status: 'pending',
-      date: ""
-    };
-    setOrder(mockOrder);
+    fetchOrderById(id);
   }, [id]);
 
   if (!order) return <p className="p-6">Loading order details...</p>;
 
-  const paymentLink = `https:/naijaescrow.vercel.app/buyer/pay/${order.id}`;
+  const paymentLink = `https:/naijaescrow.vercel.app/buyer/pay/${order._id}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(paymentLink);
@@ -53,15 +46,16 @@ export default function OrderSuccessPage() {
         </div>
       </div>
 
+
       <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-800">
         <div className="space-y-1">
-          <p><strong>Order ID:</strong> {order.id}</p>
-          <p><strong>Customer:</strong> {order.customer}</p>
-          <p><strong>Email:</strong> {order.email}</p>
-          <p><strong>Phone:</strong> {order.phone}</p>
+          <p><strong>Order ID:</strong> {order._id}</p>
+          <p><strong>Customer:</strong> {order.buyerName}</p>
+          <p><strong>Email:</strong> {order.buyerEmail}</p>
+          <p><strong>Phone:</strong> {order.buyerPhone}</p>
         </div>
         <div className="space-y-1">
-          <p><strong>Item:</strong> {order.item}</p>
+          <p><strong>Item:</strong> {order.product.name}</p>
           <p><strong>Amount:</strong> ₦{order.amount.toLocaleString()}</p>
           <p><strong>Delivery Fee:</strong> ₦{order.deliveryFee.toLocaleString()}</p>
           <p><strong>Status:</strong> 

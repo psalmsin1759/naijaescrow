@@ -1,4 +1,4 @@
-import {baseUrl} from "@/utils/api/BaseUrl";
+import {userBaseUrl} from "@/utils/api/BaseUrl";
 export interface Admin {
   _id?: string;
   firstName?: string;
@@ -30,7 +30,7 @@ export const login = async (
   password: string
 ): Promise<AdminResponse> => {
   try {
-    const res = await fetch(`${baseUrl}admins/login`, {
+    const res = await fetch(`${userBaseUrl}admins/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -63,7 +63,7 @@ export const forgotPassword = async (
   email: string
 ): Promise<AdminResponse> => {
   try {
-    const res = await fetch(`${baseUrl}admins/forgot-password`, {
+    const res = await fetch(`${userBaseUrl}admins/forgot-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -95,7 +95,7 @@ export const resetPassword = async (
   password: string
 ): Promise<AdminResponse> => {
   try {
-    const res = await fetch(`${baseUrl}admins/reset-password`, {
+    const res = await fetch(`${userBaseUrl}admins/reset-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -124,7 +124,7 @@ export const resetPassword = async (
 
 export const addAdmin = async (payload: Partial<Admin> & { password: string }): Promise<AdminResponse> => {
   try {
-    const res = await fetch(`${baseUrl}admins`, {
+    const res = await fetch(`${userBaseUrl}admins`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -155,7 +155,7 @@ export const addAdmin = async (payload: Partial<Admin> & { password: string }): 
 
 export const deleteAdmin = async (adminId: string) => {
   try {
-     await fetch(`${baseUrl}admins/${adminId}`, {
+     await fetch(`${userBaseUrl}admins/${adminId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -176,7 +176,7 @@ export const updateAdmin = async (
   payload: Admin
 ): Promise<AdminResponse> => {
   try {
-    const res = await fetch(`${baseUrl}admins/${id}`, {
+    const res = await fetch(`${userBaseUrl}admins/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -210,7 +210,7 @@ export const changePassword = async (
   newPassword: string
 ): Promise<AdminResponse> => {
   try {
-    const res = await fetch(`${baseUrl}admins/change-password/${id}`, {
+    const res = await fetch(`${userBaseUrl}admins/change-password/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -243,7 +243,7 @@ export const getAdminsByBusiness = async (
   businessId: string
 ): Promise<AdminArrayResponse> => {
   try {
-    const res = await fetch(`${baseUrl}admins/business/${businessId}`);
+    const res = await fetch(`${userBaseUrl}admins/business/${businessId}`);
 
     if (!res.ok) {
       const error = await res.json();

@@ -1,5 +1,5 @@
 import {FormData} from "@/context/FormContext";
-import {baseUrl} from "@/utils/api/BaseUrl";
+import {userBaseUrl} from "@/utils/api/BaseUrl";
 
 
 
@@ -25,7 +25,7 @@ export const createBusiness = async (
   payload: Business
 ): Promise<BusinessResponse> => {
   try {
-    const res = await fetch(`${baseUrl}businesses`, {
+    const res = await fetch(`${userBaseUrl}businesses`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export const validateBusiness = async (
   code: string
 ): Promise<BusinessResponse> => {
   try {
-    const res = await fetch(`${baseUrl}businesses/verify`, {
+    const res = await fetch(`${userBaseUrl}businesses/verify`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export const resendBusinessVerificationEmail = async (
   email: string
 ): Promise<BusinessResponse> => {
   try {
-    const res = await fetch(`${baseUrl}businesses/resend-verification`, {
+    const res = await fetch(`${userBaseUrl}businesses/resend-verification`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -124,7 +124,7 @@ export const createBusinessWithAdmin = async (
   payload: FormData
 ): Promise<BusinessResponse> => {
   try {
-    const res = await fetch(`${baseUrl}businesses/create-with-admin`, {
+    const res = await fetch(`${userBaseUrl}businesses/create-with-admin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -160,7 +160,7 @@ export const sendWelcomeEmail = async (
   name: string
 ): Promise<BusinessResponse> => {
   try {
-    const res = await fetch(`${baseUrl}businesses/sendWelcomeEmail`, {
+    const res = await fetch(`${userBaseUrl}businesses/sendWelcomeEmail`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -188,3 +188,28 @@ export const sendWelcomeEmail = async (
 };
 
 
+export const getBusinessById = async (
+  businessId: string
+): Promise<BusinessResponse> => {
+  try {
+    const res = await fetch(`${userBaseUrl}businesses/${businessId}`);
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to fetch");
+    }
+
+    const data = await res.json();
+    return {
+      success: true,
+      message: data.message || "Fetched successfully",
+      data: data.data,
+    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Unknown error occurred",
+    };
+  }
+};

@@ -6,6 +6,7 @@ import "../globals.css";
 
 import { Geist, Geist_Mono } from "next/font/google";
 import BuyerFooter from "@/components/Footer/BuyerFooter";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function BuyerLayout({
           {children}
         </main>
         <BuyerFooter />
+        <ToastContainer />
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   FaClipboardList,
@@ -11,54 +11,60 @@ import {
   FaEye,
 } from "react-icons/fa";
 import Modal from "@/components/ui/Modal";
-import { useRouter } from "next/navigation";
+import {
+  getOrdersByBusinessId,
+  getBusinessOrderStats,
+  Order,
+  Stats,
+  changeOrderStatus,
+} from "@/utils/api/Order";
 
-export interface Order {
-  id: string;
-  customer: string;
-  email: string;
-  phone: string;
-  item: string;
-  description: string;
-  amount: string;
-  deliveryFee: string;
-  status: string;
-  date: string;
-}
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
+import CreateOrderForm from "@/components/orders/CreateOrderForm";
 
 export default function OrdersPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [stats, setStats] = useState<Stats>({
+    total: 0,
+    pending: 0,
+    completed: 0,
+    cancelled: 0,
+  });
 
-  const orders: Order[] = [
-    {
-      id: "ORD001",
-      customer: "Fortune Ibe",
-      email: "fabzz@yahoo.com",
-      phone: "08012345678",
-      item: "Laptop",
-      description: "HP Pavilion 15",
-      amount: "200,000",
-      deliveryFee: "5,000",
-      status: "Pending",
-      date: "2025-06-14",
-    },
-    // More dummy orders...
-  ];
+  const { auth } = useAuth();
+  const businessId = auth?.business;
+
+  const fetchOrdersAndStats = async () => {
+    const res = await getOrdersByBusinessId(businessId!);
+    if (res.success && res.data) setOrders(res.data);
+
+    const statsRes = await getBusinessOrderStats(businessId!);
+    setStats(statsRes.data!);
+  };
+  useEffect(() => {
+    if (!businessId) return;
+
+    fetchOrdersAndStats();
+  }, [businessId]);
 
   const handleView = (order: Order) => {
     setSelectedOrder(order);
     setShowViewModal(true);
   };
 
-  const router = useRouter();
-
-  const handleSubmit = async () => {
-    //const newOrder = await createOrder(formData);
-
-    router.push(`/dashboard/orders/success/${orders[0].id}`);
-  };
+ const statusColors: Record<string, string> = {
+  released: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+  pending: "bg-amber-50 text-amber-700 border border-amber-200",
+  shipped: "bg-sky-50 text-sky-700 border border-sky-200",
+  delivered: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+  paid: "bg-blue-50 text-blue-700 border border-blue-200",
+  cancelled: "bg-rose-50 text-rose-700 border border-rose-200",
+  default: "bg-gray-50 text-gray-700 border border-gray-200",
+};
 
   return (
     <motion.div
@@ -72,25 +78,25 @@ export default function OrdersPage() {
         {[
           {
             title: "Pending Orders",
-            count: 3,
+            count: stats.pending,
             icon: <FaClock />,
             color: "bg-yellow-100 text-yellow-800",
           },
           {
             title: "Total Orders",
-            count: 12,
+            count: stats.total,
             icon: <FaClipboardList />,
             color: "bg-blue-100 text-blue-800",
           },
           {
             title: "Completed Orders",
-            count: 7,
+            count: stats.completed,
             icon: <FaCheckCircle />,
             color: "bg-green-100 text-green-800",
           },
           {
             title: "Canceled Orders",
-            count: 2,
+            count: stats.cancelled,
             icon: <FaTimesCircle />,
             color: "bg-red-100 text-red-800",
           },
@@ -132,26 +138,24 @@ export default function OrdersPage() {
               <th className="py-2 px-4">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {orders.map((order, idx) => (
               <tr key={idx} className="border-t hover:bg-gray-50">
-                <td className="py-2 px-4 font-medium">{order.id}</td>
-                <td className="py-2 px-4">{order.customer}</td>
+                <td className="py-2 px-4 font-medium">{order._id}</td>
+                <td className="py-2 px-4">{order.buyerName}</td>
                 <td className="py-2 px-4">{order.amount}</td>
                 <td className="py-2 px-4">
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      order.status === "Completed"
-                        ? "bg-green-100 text-green-800"
-                        : order.status === "Pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
+                      statusColors[order.status] || statusColors.default
                     }`}
                   >
-                    {order.status}
+                    {order.status.charAt(0).toUpperCase() +
+                      order.status.slice(1)}
                   </span>
                 </td>
-                <td className="py-2 px-4">{order.date}</td>
+                <td className="py-2 px-4">{order.createdAt}</td>
                 <td className="py-2 px-4">
                   <button
                     onClick={() => handleView(order)}
@@ -171,120 +175,51 @@ export default function OrdersPage() {
         onClose={() => setShowCreateModal(false)}
         title="Create New Order"
       >
-        <form className="space-y-4 text-sm text-gray-700">
-          <div>
-            <label className="block mb-1 font-medium">Customer Name</label>
-            <input
-              placeholder="e.g. John Doe"
-              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block mb-1 font-medium">Phone Number</label>
-              <input
-                placeholder="e.g. 08012345678"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block mb-1 font-medium">Email</label>
-              <input
-                type="email"
-                placeholder="e.g. customer@example.com"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block mb-1 font-medium">Order Item</label>
-            <input
-              placeholder="e.g. Apple MacBook Pro"
-              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1 font-medium">Item Description</label>
-            <textarea
-              placeholder="Short description of the item"
-              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-              rows={3}
-            ></textarea>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block mb-1 font-medium">Amount (₦)</label>
-              <input
-                placeholder="e.g. 200000"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block mb-1 font-medium">Delivery Fee (₦)</label>
-              <input
-                placeholder="e.g. 5000"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <button
-              onClick={handleSubmit}
-              className="w-full bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-md font-medium transition-all duration-300"
-            >
-              Submit Order
-            </button>
-          </div>
-        </form>
+        <CreateOrderForm />
       </Modal>
 
       <Modal
         isOpen={showViewModal}
         onClose={() => setShowViewModal(false)}
-        title={`Order Details - ${selectedOrder?.id}`}
+        title={`Order Details - ${selectedOrder?.orderId}`}
       >
         {selectedOrder && (
-          <div className="space-y-4 text-sm text-gray-700">
+          <div className="space-y-6 text-sm text-gray-800">
+            {/* Order Summary */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="mb-1 text-xs text-gray-500 uppercase">
                   Customer Name
                 </p>
-                <p className="font-medium">{selectedOrder.customer}</p>
+                <p className="font-medium">{selectedOrder.buyerName}</p>
               </div>
-
               <div>
                 <p className="mb-1 text-xs text-gray-500 uppercase">Email</p>
-                <p>{selectedOrder.email}</p>
+                <p>{selectedOrder.buyerEmail}</p>
               </div>
-
               <div>
                 <p className="mb-1 text-xs text-gray-500 uppercase">Phone</p>
-                <p>{selectedOrder.phone}</p>
+                <p>{selectedOrder.buyerPhone}</p>
               </div>
+              <div>
+                <p className="mb-1 text-xs text-gray-500 uppercase">Product</p>
+                <p className="font-medium">{selectedOrder.product.name}</p>
+              </div>
+            </div>
 
+            {/* Description */}
+            {selectedOrder.product.description && (
               <div>
                 <p className="mb-1 text-xs text-gray-500 uppercase">
-                  Order Item
+                  Description
                 </p>
-                <p>{selectedOrder.item}</p>
+                <p className="leading-relaxed">
+                  {selectedOrder.product.description}
+                </p>
               </div>
-            </div>
+            )}
 
-            <div>
-              <p className="mb-1 text-xs text-gray-500 uppercase">
-                Description
-              </p>
-              <p className="text-sm leading-relaxed">
-                {selectedOrder.description}
-              </p>
-            </div>
-
+            {/* Amounts */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="mb-1 text-xs text-gray-500 uppercase">Amount</p>
@@ -292,7 +227,6 @@ export default function OrdersPage() {
                   ₦{selectedOrder.amount.toLocaleString()}
                 </p>
               </div>
-
               <div>
                 <p className="mb-1 text-xs text-gray-500 uppercase">
                   Delivery Fee
@@ -303,18 +237,62 @@ export default function OrdersPage() {
               </div>
             </div>
 
-            <div className="pt-4">
-              <label className="block mb-1 font-medium text-gray-700">
-                Order Status
-              </label>
+            {/* Status */}
+            <div className="border-t pt-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="block font-medium text-gray-700">
+                  Order Status
+                </span>
+                <span
+                  className={`px-3 py-1 text-xs rounded-full font-medium ${
+                    selectedOrder.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : selectedOrder.status === "paid"
+                      ? "bg-blue-100 text-blue-800"
+                      : selectedOrder.status === "shipped"
+                      ? "bg-purple-100 text-purple-800"
+                      : selectedOrder.status === "delivered"
+                      ? "bg-indigo-100 text-indigo-800"
+                      : selectedOrder.status === "released"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {selectedOrder.status.toUpperCase()}
+                </span>
+              </div>
+
               <select
-                defaultValue={selectedOrder.status}
+                value={selectedOrder.status}
+                onChange={(e) =>
+                  setSelectedOrder({ ...selectedOrder, status: e.target.value })
+                }
                 className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-                <option value="canceled">Canceled</option>
+                <option value="shipped">Shipped</option>
+               {/*  <option value="delivered">Delivered</option> */}
+                <option value="cancelled">Cancelled</option>
               </select>
+
+              <button
+                onClick={async () => {
+                  if (!selectedOrder) return;
+                  const res = await changeOrderStatus(
+                    selectedOrder._id!,
+                    selectedOrder.status
+                  );
+                  if (res.success) {
+                    toast.success("Status updated successfully");
+                    setShowViewModal(false);
+                    fetchOrdersAndStats();
+                  } else {
+                    toast.error(res.message || "Failed to update status");
+                  }
+                }}
+                className="mt-4 w-full bg-primary text-white py-2 rounded-md hover:bg-primary-dark transition"
+              >
+                Save Status
+              </button>
             </div>
           </div>
         )}
