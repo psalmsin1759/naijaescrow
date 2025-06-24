@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   FaWallet,
@@ -11,12 +11,50 @@ import {
 } from "react-icons/fa";
 import Modal from "@/components/ui/Modal";
 import CreateOrderForm from "@/components/orders/CreateOrderForm";
+import {
+  getOrdersByBusinessId,
+  getBusinessOrderStats,
+  Order,
+  Stats,
+} from "@/utils/api/Order";
+import { useAuth } from "@/context/AuthContext";
+
 export default function DashboardPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-
-
+   const [orders, setOrders] = useState<Order[]>([]);
+    const [stats, setStats] = useState<Stats>({
+      total: 0,
+      pending: 0,
+      completed: 0,
+      cancelled: 0,
+    });
   
+    const { auth } = useAuth();
+    const businessId = auth?.business;
+  
+    const fetchOrdersAndStats = async () => {
+      const res = await getOrdersByBusinessId(businessId!);
+      if (res.success && res.data) setOrders(res.data);
+  
+      const statsRes = await getBusinessOrderStats(businessId!);
+      setStats(statsRes.data!);
+    };
+    useEffect(() => {
+      if (!businessId) return;
+  
+      fetchOrdersAndStats();
+    }, [businessId]);
+  
+     const statusColors: Record<string, string> = {
+  released: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+  pending: "bg-amber-50 text-amber-700 border border-amber-200",
+  shipped: "bg-sky-50 text-sky-700 border border-sky-200",
+  delivered: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+  paid: "bg-blue-50 text-blue-700 border border-blue-200",
+  cancelled: "bg-rose-50 text-rose-700 border border-rose-200",
+  default: "bg-gray-50 text-gray-700 border border-gray-200",
+};
 
   return (
     <motion.div
@@ -43,14 +81,14 @@ export default function DashboardPage() {
           },
           {
             title: "Pending Transactions",
-            value: "3",
+            value: stats.pending,
             desc: "Awaiting confirmation",
             icon: <FaClock />,
             color: "bg-yellow-100 text-yellow-800",
           },
           {
             title: "Completed Transactions",
-            value: "18",
+            value: stats.completed,
             desc: "Successfully processed",
             icon: <FaCheckCircle />,
             color: "bg-purple-100 text-purple-800",
@@ -101,47 +139,22 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  {
-                    id: "ORD1234",
-                    buyer: "Chinedu O.",
-                    amount: "₦50,000",
-                    status: "Pending",
-                    date: "2025-06-14",
-                  },
-                  {
-                    id: "ORD1233",
-                    buyer: "Ngozi A.",
-                    amount: "₦75,000",
-                    status: "Completed",
-                    date: "2025-06-13",
-                  },
-                  {
-                    id: "ORD1232",
-                    buyer: "Ibrahim K.",
-                    amount: "₦30,000",
-                    status: "Cancelled",
-                    date: "2025-06-12",
-                  },
-                ].map((order, index) => (
+                {orders.map((order, index) => (
                   <tr key={index} className="border-t hover:bg-gray-50">
-                    <td className="py-2 px-4 font-medium">{order.id}</td>
-                    <td className="py-2 px-4">{order.buyer}</td>
+                    <td className="py-2 px-4 font-medium">{order._id}</td>
+                    <td className="py-2 px-4">{order.buyerName}</td>
                     <td className="py-2 px-4">{order.amount}</td>
                     <td className="py-2 px-4">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          order.status === "Completed"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "Pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {order.status}
-                      </span>
+                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                      statusColors[order.status] || statusColors.default
+                    }`}
+                  >
+                    {order.status.charAt(0).toUpperCase() +
+                      order.status.slice(1)}
+                  </span>
                     </td>
-                    <td className="py-2 px-4">{order.date}</td>
+                    <td className="py-2 px-4">{order.createdAt}</td>
                   </tr>
                 ))}
               </tbody>
