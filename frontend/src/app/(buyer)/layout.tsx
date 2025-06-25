@@ -7,6 +7,7 @@ import "../globals.css";
 import { Geist, Geist_Mono } from "next/font/google";
 import BuyerFooter from "@/components/Footer/BuyerFooter";
 import { ToastContainer } from "react-toastify";
+import { OrderProvider } from "@/context/OrderContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,11 +34,14 @@ export default function BuyerLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <BuyerHeader />
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
-          {children}
-        </main>
-        <BuyerFooter />
+        <OrderProvider>
+          <BuyerHeader />
+          <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
+            {children}
+          </main>
+          <BuyerFooter />
+        </OrderProvider>
+
         <ToastContainer />
       </body>
     </html>

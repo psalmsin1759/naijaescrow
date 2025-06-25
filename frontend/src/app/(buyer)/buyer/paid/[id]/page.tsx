@@ -16,6 +16,7 @@ import { getBusinessById, Business } from "@/utils/api/Business";
 import Modal from "@/components/ui/Modal";
 import { toast } from "react-toastify";
 import { creditWallet } from "@/utils/api/Wallet";
+import { useOrder } from "@/context/OrderContext";
 
 type OrderStatus = "paid" | "shipped" | "released";
 
@@ -26,16 +27,20 @@ export default function PaymentSuccessPage() {
   const [business, setBusiness] = useState<Business | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+   const { setOrderContext } = useOrder();
+
   const fetchOrderById = async (id: string) => {
     const res = await getOrdersById(id);
 
     setOrder(res.data!);
+     setOrderContext(res.data!);
     setBusinessId(res.data!.businessId);
     const resBiz = await getBusinessById(res.data!.businessId);
     setBusiness(resBiz.data!);
   };
 
   useEffect(() => {
+   
     fetchOrderById(id);
   }, [id]);
 

@@ -7,6 +7,7 @@ import { FaLock } from "react-icons/fa";
 import dynamic from "next/dynamic";
 import { getOrdersById, Order, changeOrderStatus, updateOrder } from "@/utils/api/Order";
 import { getBusinessById, Business } from "@/utils/api/Business";
+import { useOrder } from "@/context/OrderContext";
 
 const PaystackButton = dynamic(
   () => import("react-paystack").then((mod) => mod.PaystackButton),
@@ -20,6 +21,8 @@ export default function PayPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+
+  const { setOrderContext } = useOrder();
 
   const router = useRouter();
 
@@ -35,6 +38,7 @@ export default function PayPage() {
     const res = await getOrdersById(id);
     checkOrderStatusAndRedirect(res.data!)
     setOrder(res.data!);
+     setOrderContext(res.data!);
     setName(res.data!.buyerName!);
      const resBiz =   await getBusinessById(res.data!.businessId)
      setBusiness(resBiz.data!);
@@ -51,6 +55,7 @@ export default function PayPage() {
 
 
   useEffect(() => {
+   
     fetchOrderById(id);
   }, [id]);
 
