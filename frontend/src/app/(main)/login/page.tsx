@@ -40,7 +40,7 @@ export default function LoginPage() {
 
           console.log(authData);
           setAuth(authData);
-          toast.success("Login successfully");
+          //toast.success("Login successfully");
           router.push("/dashboard");
         } else {
           toast.error(res.message || "Something went wrong");
