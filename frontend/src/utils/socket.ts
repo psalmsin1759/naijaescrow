@@ -2,7 +2,7 @@
 import { io, Socket } from "socket.io-client";
 
 //const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
-const SOCKET_URL = "https://ne-chatservice-670756454854.europe-west1.run.app";
+const SOCKET_URL = "https://chatservice.qnetixtechnologies.com";
 
 let socket: Socket | null = null;
 
