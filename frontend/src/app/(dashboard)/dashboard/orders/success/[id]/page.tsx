@@ -23,7 +23,7 @@ export default function OrderSuccessPage() {
 
   if (!order) return <p className="p-6">Loading order details...</p>;
 
-  const paymentLink = `https:/naijaescrow.vercel.app/buyer/pay/${order._id}`;
+  const paymentLink = `https://naijaescrow.vercel.app/buyer/pay/${order._id}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(paymentLink);
