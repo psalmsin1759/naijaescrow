@@ -1,17 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaSearch, FaDownload } from 'react-icons/fa';
 import { format } from 'date-fns';
+import { WalletTransaction } from '@/utils/api/Wallet';
+import { useAuth } from '@/context/AuthContext';
+import {
+  getTransactions,
+} from "@/utils/api/Wallet";
 
-interface Transaction {
-  id: string;
-  date: string;
-  type: 'Credit' | 'Debit';
-  amount: number;
-  description: string;
-}
 
 export default function TransactionPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,36 +18,47 @@ export default function TransactionPage() {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
-  const transactions: Transaction[] = [
-    { id: 'T1', date: '2024-06-01', type: 'Credit', amount: 200000, description: 'Payment from John' },
-    { id: 'T2', date: '2024-06-05', type: 'Debit', amount: 50000, description: 'Withdrawal to UBA' },
-    { id: 'T3', date: '2024-06-10', type: 'Credit', amount: 150000, description: 'Payment from Zainab' },
-    { id: 'T4', date: '2024-06-12', type: 'Debit', amount: 20000, description: 'Transfer to supplier' },
-  ];
+   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
 
-  // Filter + sort
+    const { auth } = useAuth();
+     const businessId = auth?.business;
+
+     useEffect(() => {
+         if (businessId) {
+           handleTransaction(businessId);
+         }
+       }, [businessId]);
+
+       const handleTransaction = async (businessId: string) => {
+          const res = await getTransactions(businessId);
+           setTransactions(res.data!)
+       }
+
+  
+
+ 
   const filtered = transactions
     .filter(tx =>
-      tx.description.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (!fromDate || new Date(tx.date) >= new Date(fromDate)) &&
-      (!toDate || new Date(tx.date) <= new Date(toDate))
+      tx.narration.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (!fromDate || new Date(tx.createdAt!) >= new Date(fromDate)) &&
+      (!toDate || new Date(tx.createdAt!) <= new Date(toDate))
     )
     .sort((a, b) => {
       if (sortField === 'amount') {
         return sortAsc ? a.amount - b.amount : b.amount - a.amount;
       } else {
         return sortAsc
-          ? new Date(a.date).getTime() - new Date(b.date).getTime()
-          : new Date(b.date).getTime() - new Date(a.date).getTime();
+          ? new Date(a.createdAt!).getTime() - new Date(b.createdAt!).getTime()
+          : new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime();
       }
     });
 
   const handleExport = () => {
     const exportData = filtered.map(tx => ({
-      Date: tx.date,
+      Date: tx.createdAt!,
       Type: tx.type,
       Amount: tx.amount,
-      Description: tx.description,
+      Description: tx.narration,
     }));
     const csv = [
       Object.keys(exportData[0]).join(','),
@@ -139,16 +148,16 @@ export default function TransactionPage() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((tx) => (
-              <tr key={tx.id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3">{tx.date}</td>
+            {filtered.map((tx, index) => (
+              <tr key={index} className="border-b hover:bg-gray-50">
+                <td className="px-4 py-3">{tx.createdAt!}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${tx.type === 'Credit' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${tx.type === 'credit' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
                     {tx.type}
                   </span>
                 </td>
                 <td className="px-4 py-3 font-semibold">₦{tx.amount.toLocaleString()}</td>
-                <td className="px-4 py-3">{tx.description}</td>
+                <td className="px-4 py-3">{tx.narration!}</td>
               </tr>
             ))}
             {filtered.length === 0 && (

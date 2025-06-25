@@ -16,12 +16,12 @@ import {
   getBusinessOrderStats,
   Order,
   Stats,
-  changeOrderStatus,
+  
 } from "@/utils/api/Order";
 
 import { useAuth } from "@/context/AuthContext";
-import { toast } from "react-toastify";
 import CreateOrderForm from "@/components/orders/CreateOrderForm";
+import ChangeOrderForm from "@/components/orders/ChangeOrderForm";
 
 export default function OrdersPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -35,10 +35,13 @@ export default function OrdersPage() {
     cancelled: 0,
   });
 
+  
   const { auth } = useAuth();
   const businessId = auth?.business;
 
-  const fetchOrdersAndStats = async () => {
+  
+
+  const fetchOrdersAndStats = async (businessId: string) => {
     const res = await getOrdersByBusinessId(businessId!);
     if (res.success && res.data) setOrders(res.data);
 
@@ -48,7 +51,7 @@ export default function OrdersPage() {
   useEffect(() => {
     if (!businessId) return;
 
-    fetchOrdersAndStats();
+    fetchOrdersAndStats(businessId);
   }, [businessId]);
 
   const handleView = (order: Order) => {
@@ -183,119 +186,7 @@ export default function OrdersPage() {
         onClose={() => setShowViewModal(false)}
         title={`Order Details - ${selectedOrder?.orderId}`}
       >
-        {selectedOrder && (
-          <div className="space-y-6 text-sm text-gray-800">
-            {/* Order Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="mb-1 text-xs text-gray-500 uppercase">
-                  Customer Name
-                </p>
-                <p className="font-medium">{selectedOrder.buyerName}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-xs text-gray-500 uppercase">Email</p>
-                <p>{selectedOrder.buyerEmail}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-xs text-gray-500 uppercase">Phone</p>
-                <p>{selectedOrder.buyerPhone}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-xs text-gray-500 uppercase">Product</p>
-                <p className="font-medium">{selectedOrder.product.name}</p>
-              </div>
-            </div>
-
-            {/* Description */}
-            {selectedOrder.product.description && (
-              <div>
-                <p className="mb-1 text-xs text-gray-500 uppercase">
-                  Description
-                </p>
-                <p className="leading-relaxed">
-                  {selectedOrder.product.description}
-                </p>
-              </div>
-            )}
-
-            {/* Amounts */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="mb-1 text-xs text-gray-500 uppercase">Amount</p>
-                <p className="font-semibold text-green-600">
-                  ₦{selectedOrder.amount.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="mb-1 text-xs text-gray-500 uppercase">
-                  Delivery Fee
-                </p>
-                <p className="font-semibold text-blue-600">
-                  ₦{selectedOrder.deliveryFee.toLocaleString()}
-                </p>
-              </div>
-            </div>
-
-            {/* Status */}
-            <div className="border-t pt-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="block font-medium text-gray-700">
-                  Order Status
-                </span>
-                <span
-                  className={`px-3 py-1 text-xs rounded-full font-medium ${
-                    selectedOrder.status === "pending"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : selectedOrder.status === "paid"
-                      ? "bg-blue-100 text-blue-800"
-                      : selectedOrder.status === "shipped"
-                      ? "bg-purple-100 text-purple-800"
-                      : selectedOrder.status === "delivered"
-                      ? "bg-indigo-100 text-indigo-800"
-                      : selectedOrder.status === "released"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {selectedOrder.status.toUpperCase()}
-                </span>
-              </div>
-
-              <select
-                value={selectedOrder.status}
-                onChange={(e) =>
-                  setSelectedOrder({ ...selectedOrder, status: e.target.value })
-                }
-                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="shipped">Shipped</option>
-               {/*  <option value="delivered">Delivered</option> */}
-                <option value="cancelled">Cancelled</option>
-              </select>
-
-              <button
-                onClick={async () => {
-                  if (!selectedOrder) return;
-                  const res = await changeOrderStatus(
-                    selectedOrder._id!,
-                    selectedOrder.status
-                  );
-                  if (res.success) {
-                    toast.success("Status updated successfully");
-                    setShowViewModal(false);
-                    fetchOrdersAndStats();
-                  } else {
-                    toast.error(res.message || "Failed to update status");
-                  }
-                }}
-                className="mt-4 w-full bg-primary text-white py-2 rounded-md hover:bg-primary-dark transition"
-              >
-                Save Status
-              </button>
-            </div>
-          </div>
-        )}
+       <ChangeOrderForm selectedOrder={selectedOrder!} businessId={businessId!} showViewModal={() => setShowViewModal(false)} fetchOrdersAndStats={fetchOrdersAndStats} />
       </Modal>
     </motion.div>
   );

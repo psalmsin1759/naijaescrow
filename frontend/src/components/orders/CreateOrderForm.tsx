@@ -5,24 +5,25 @@ import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { createOrder } from "@/utils/api/Order";
 import { toast } from "react-toastify";
+import { FaSpinner } from "react-icons/fa";
 
 export default function CreateOrderForm() {
   const { auth } = useAuth();
   const businessId = auth?.business;
-
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false); // 🔁 Loading state
   const [form, setForm] = useState({
     buyerName: "",
-    //buyerEmail: "",
-    //buyerPhone: "",
     productName: "",
     productDescription: "",
     amount: "",
     deliveryFee: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -35,11 +36,11 @@ export default function CreateOrderForm() {
       return;
     }
 
+    setLoading(true); // Start loading
+
     const payload = {
       buyerName: form.buyerName,
       sellerEmail: auth.adminEmail,
-      //buyerEmail: form.buyerEmail,
-      //buyerPhone: form.buyerPhone,
       product: {
         name: form.productName,
         description: form.productDescription,
@@ -49,20 +50,23 @@ export default function CreateOrderForm() {
       businessId,
     };
 
-    const response = await createOrder(payload);
-    if (response.success && response.data) {
-      //toast.success("Order created successfully");
-      router.push(`/dashboard/orders/success/${response.data._id}`);
-    } else {
-      toast.error(response.message || "Failed to create order");
+    try {
+      const response = await createOrder(payload);
+      if (response.success && response.data) {
+        router.push(`/dashboard/orders/success/${response.data._id}`);
+      } else {
+        toast.error(response.message || "Failed to create order");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 text-sm text-gray-700"
-    >
+    <form onSubmit={handleSubmit} className="space-y-4 text-sm text-gray-700">
       <div>
         <label className="block mb-1 font-medium">Customer Name</label>
         <input
@@ -74,32 +78,6 @@ export default function CreateOrderForm() {
           className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
         />
       </div>
-
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block mb-1 font-medium">Phone Number</label>
-          <input
-            name="buyerPhone"
-            value={form.buyerPhone}
-            onChange={handleChange}
-            placeholder="e.g. 08012345678"
-            required
-            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-medium">Email</label>
-          <input
-            name="buyerEmail"
-            type="email"
-            value={form.buyerEmail}
-            onChange={handleChange}
-            placeholder="e.g. customer@example.com"
-            required
-            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
-          />
-        </div>
-      </div> */}
 
       <div>
         <label className="block mb-1 font-medium">Order Item</label>
@@ -155,10 +133,24 @@ export default function CreateOrderForm() {
       <div className="pt-4">
         <button
           type="submit"
-          className="w-full bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-md font-medium transition-all duration-300"
+          disabled={loading}
+          className={`w-full text-white px-6 py-2 rounded-md font-medium transition-all duration-300 ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary hover:bg-primary-dark"
+          }`}
         >
-          Submit Order
+          {loading ? (
+            <div className="flex gap-2 justify-center items-center">
+              <FaSpinner className="animate-spin" /> Processing...
+            </div>
+          ) : (
+            "Submit Order"
+          )}
+          
         </button>
+
+        
       </div>
     </form>
   );

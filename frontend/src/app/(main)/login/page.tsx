@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FaLock, FaEnvelope } from "react-icons/fa";
+import { FaLock, FaEnvelope, FaSpinner } from "react-icons/fa";
 import Link from "next/link";
 import { login } from "@/utils/api/Admin";
 import { toast } from "react-toastify";
@@ -25,7 +25,7 @@ export default function LoginPage() {
     try {
       if (email && password) {
         const res = await login(email, password);
-        
+
         if (res.success) {
           //console.log (res);
           const authData = {
@@ -35,10 +35,10 @@ export default function LoginPage() {
             adminEmail: res?.data?.email,
             adminPhone: res?.data?.phone,
             business: res?.data?.business,
-            token: res.token
+            token: res.token,
           };
 
-          console.log (authData);
+          console.log(authData);
           setAuth(authData);
           toast.success("Login successfully");
           router.push("/dashboard");
@@ -120,7 +120,13 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary-dark transition font-medium"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? (
+              <div className="flex gap-2 justify-center items-center">
+                <FaSpinner className="animate-spin" /> Logging in...
+              </div>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
 
