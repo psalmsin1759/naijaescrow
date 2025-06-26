@@ -4,38 +4,56 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaPaperPlane } from "react-icons/fa";
 import { useOrder } from "@/context/OrderContext";
 import { initSocket } from "@/utils/socket";
+import { getChatHistory, ChatMessage } from "@/utils/api/Chat";
+import { ChatBubble } from "./ChatBubble";
 
 interface ChatProps {
   showChat: boolean;
   hideChat: () => void;
 }
 
-interface ChatMessage {
-  orderId: string;
-  senderId: string;
-  senderRole: 'buyer' | 'seller'; 
-  message?: string;
-}
 
 export default function BuyChat({ showChat, hideChat }: ChatProps) {
   const { orderContext } = useOrder();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const socketRef = useRef<any>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null); 
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
-    if (!orderContext) return;
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  
+  setTimeout(scrollToBottom, 100); 
+}, [messages]);
+
+
+  const fetchChats = async (orderId: string) => {
+    const res = await getChatHistory(orderId);
+    if (res.success && Array.isArray(res.data)) {
+      setMessages(res.data);
+    }
+  };
+
+  useEffect(() => {
+    if (!orderContext?._id) return;
 
     const socket = initSocket();
     socketRef.current = socket;
 
-    socket.emit("joinRoom", orderContext._id);
+    const roomId = orderContext._id;
+
+    socket.emit("joinRoom", roomId);
+    fetchChats(roomId);
 
     socket.on("receiveMessage", (msg: ChatMessage) => {
-      console.log (msg);
-      if (msg.orderId === orderContext._id) {
+      if (msg.orderId === roomId) {
         setMessages((prev) => [...prev, msg]);
       }
     });
@@ -46,26 +64,18 @@ export default function BuyChat({ showChat, hideChat }: ChatProps) {
   }, [orderContext]);
 
   const handleSend = () => {
+    if (!message.trim() || !socketRef.current || !orderContext?._id) return;
 
-   
-  if (!message.trim() || !socketRef.current || !orderContext) return;
+    const msg = {
+      orderId: orderContext._id,
+      senderId: orderContext.buyerName,
+      senderRole: "buyer",
+      message,
+    };
 
-  const msg: ChatMessage = {
-    orderId : orderContext._id!,
-    senderId: orderContext.buyerName,
-    senderRole: "buyer",
-    message,
+    socketRef.current.emit("sendMessage", msg);
+    setMessage("");
   };
-
-  console.log (msg)
-;
-  
-
-  socketRef.current.emit("sendMessage", msg);
-  //setMessages((prev) => [...prev, msg]);
-  setMessage("");
-};
-
 
   return (
     <div
@@ -74,27 +84,17 @@ export default function BuyChat({ showChat, hideChat }: ChatProps) {
       }`}
     >
       <div className="flex items-center justify-between p-4 border-b bg-gray-50">
-        <h3 className="font-semibold text-gray-800">
-          Chat with Seller 
-        </h3>
+        <h3 className="font-semibold text-gray-800">Chat with Seller</h3>
         <button onClick={hideChat} className="text-gray-600 hover:text-red-500">
           <FaTimes />
         </button>
       </div>
 
       <div className="flex-1 p-4 space-y-3 overflow-y-auto">
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`text-sm max-w-[75%] p-3 rounded-lg ${
-              msg.senderRole === "buyer"
-                ? "bg-primary text-white self-end ml-auto"
-                : "bg-gray-100 text-gray-700"
-            }`}
-          >
-            {msg.message}
-          </div>
+        {messages.map((msg, index) => (
+          <ChatBubble key={index} chatMessage={msg} />
         ))}
+        <div ref={messagesEndRef} /> {/* ✅ Anchor element for scrolling */}
       </div>
 
       <div className="p-4 border-t bg-white">

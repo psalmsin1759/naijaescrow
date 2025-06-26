@@ -4,4 +4,6 @@ export const orderBaseUrl = "https://orderservice.qnetixtechnologies.com/api/";
 
 export const walletBaseUrl = "https://walletservice.qnetixtechnologies.com/api/";
 
+export const chatBaseUrl = "https://chatservice.qnetixtechnologies.com/api/";
+
 //6859a979c8123dbfc5989ec7
