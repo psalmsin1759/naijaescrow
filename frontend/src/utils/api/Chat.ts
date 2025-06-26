@@ -7,6 +7,7 @@ export interface ChatMessage {
   senderRole: string;
   message: string;
   isRead?: string;
+  businessId? : string;
   createdAt: string;
 }
 

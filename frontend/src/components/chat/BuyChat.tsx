@@ -71,6 +71,7 @@ export default function BuyChat({ showChat, hideChat }: ChatProps) {
       senderId: orderContext.buyerName,
       senderRole: "buyer",
       message,
+      businessId: orderContext.businessId
     };
 
     socketRef.current.emit("sendMessage", msg);
