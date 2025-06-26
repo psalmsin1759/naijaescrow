@@ -12,27 +12,21 @@ interface ChatProps {
   hideChat: () => void;
 }
 
+let typingTimeout: NodeJS.Timeout;
 
 export default function BuyChat({ showChat, hideChat }: ChatProps) {
   const { orderContext } = useOrder();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const socketRef = useRef<any>(null);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null); 
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [typingUser, setTypingUser] = useState<string | null>(null);
 
   useEffect(() => {
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  
-  setTimeout(scrollToBottom, 100); 
-}, [messages]);
-
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const fetchChats = async (orderId: string) => {
     const res = await getChatHistory(orderId);
@@ -49,33 +43,74 @@ export default function BuyChat({ showChat, hideChat }: ChatProps) {
 
     const roomId = orderContext._id;
 
-    socket.emit("joinRoom", roomId);
+    socket.emit("joinRoom", { type: "order", id: roomId });
     fetchChats(roomId);
 
     socket.on("receiveMessage", (msg: ChatMessage) => {
       if (msg.orderId === roomId) {
         setMessages((prev) => [...prev, msg]);
+
+        // Send read acknowledgment
+        socket.emit("messageRead", {
+          messageId: msg._id,
+          orderId: msg.orderId,
+        });
       }
     });
 
+    socket.on("typing", ({ senderId }) => {
+      setTypingUser(senderId);
+    });
+
+    socket.on("stopTyping", () => {
+      setTypingUser(null);
+    });
+
     return () => {
-      socket.disconnect();
+      socket.off("receiveMessage");
     };
   }, [orderContext]);
 
   const handleSend = () => {
     if (!message.trim() || !socketRef.current || !orderContext?._id) return;
 
-    const msg = {
+    const newMsg: ChatMessage = {
       orderId: orderContext._id,
       senderId: orderContext.buyerName,
       senderRole: "buyer",
       message,
-      businessId: orderContext.businessId
+      businessId: orderContext.businessId,
+      createdAt: new Date().toISOString(),
+      //isRead: false, // assume unread when sending
     };
 
-    socketRef.current.emit("sendMessage", msg);
+    socketRef.current.emit("sendMessage", newMsg);
     setMessage("");
+
+    socketRef.current.emit("stopTyping", {
+      orderId: orderContext._id,
+      senderId: orderContext.buyerName,
+    });
+  };
+
+  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value;
+    setMessage(text);
+
+    if (socketRef.current && orderContext?._id) {
+      socketRef.current.emit("typing", {
+        orderId: orderContext._id,
+        senderId: orderContext.buyerName,
+      });
+
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        socketRef.current.emit("stopTyping", {
+          orderId: orderContext._id,
+          senderId: orderContext.buyerName,
+        });
+      }, 2000);
+    }
   };
 
   return (
@@ -95,7 +130,14 @@ export default function BuyChat({ showChat, hideChat }: ChatProps) {
         {messages.map((msg, index) => (
           <ChatBubble key={index} chatMessage={msg} />
         ))}
-        <div ref={messagesEndRef} /> {/* ✅ Anchor element for scrolling */}
+
+        {typingUser && (
+          <div className="text-xs text-gray-400 italic">
+            {typingUser} is typing...
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="p-4 border-t bg-white">
@@ -109,7 +151,7 @@ export default function BuyChat({ showChat, hideChat }: ChatProps) {
           <input
             type="text"
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={handleTyping}
             placeholder="Type your message..."
             className="flex-1 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />

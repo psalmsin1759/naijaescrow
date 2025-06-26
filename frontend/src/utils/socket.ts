@@ -1,7 +1,6 @@
-// socket.ts
 import { io, Socket } from "socket.io-client";
 
-//const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+
 const SOCKET_URL = "https://chatservice.qnetixtechnologies.com";
 
 let socket: Socket | null = null;
@@ -13,7 +12,7 @@ export const initSocket = (): Socket => {
       autoConnect: true,
     });
 
-    // Optional debug
+    
     socket.on("connect", () => {
       console.log(" Connected to socket:", socket);
     });

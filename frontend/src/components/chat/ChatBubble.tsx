@@ -14,10 +14,8 @@ export const ChatBubble = ({ chatMessage }: ChatMessageProps) => {
   return (
     <div className={`w-full flex ${isBuyer ? "justify-end" : "justify-start"} mb-4`}>
       <div className={`max-w-[75%] flex flex-col ${isBuyer ? "items-end" : "items-start"} space-y-1`}>
-        {/* Sender Name */}
         <span className="text-xs text-gray-500">{chatMessage.senderId}</span>
 
-        {/* Message Bubble */}
         <div
           className={`relative px-4 py-3 rounded-xl shadow-md break-words text-sm leading-relaxed ${
             isBuyer
@@ -27,7 +25,6 @@ export const ChatBubble = ({ chatMessage }: ChatMessageProps) => {
         >
           <p>{chatMessage.message}</p>
 
-          {/* Timestamp + Read status (inline at bottom right inside bubble) */}
           <div
             className={`mt-2 text-[10px] flex items-center gap-1 justify-end ${
               isBuyer ? "text-white/70" : "text-gray-500"

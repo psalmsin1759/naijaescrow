@@ -44,3 +44,30 @@ export const getChatHistory = async (
     };
   }
 };
+
+
+export const getChatByBusinessId = async (
+  businessId: string
+): Promise<ChatResponse> => {
+  try {
+    const res = await fetch(`${chatBaseUrl}chats/${businessId}/business`);
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to fetch");
+    }
+
+    const data = await res.json();
+    return {
+      success: true,
+      message: data.message || "Fetched successfully",
+      data: data.data,
+    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Unknown error occurred",
+    };
+  }
+};

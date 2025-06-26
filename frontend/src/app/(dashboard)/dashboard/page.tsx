@@ -45,7 +45,7 @@ export default function DashboardPage() {
 
   const fetchWallet = async (businessId: string) => {
     const res = await getWallet(businessId);
-    console.log(res);
+    //console.log(res);
     if (res.success) setWallet(res.data!.balance!)
    
   }

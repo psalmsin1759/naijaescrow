@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -14,10 +14,12 @@ import {
   FaUserCircle,
   FaKey,
   FaSignOutAlt,
+  FaComments,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "react-toastify";
+import { initSocket } from "@/utils/socket";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: <FaTachometerAlt /> },
@@ -28,6 +30,7 @@ const navItems = [
     href: "/dashboard/transactions",
     icon: <FaExchangeAlt />,
   },
+  { name: "Chat", href: "/dashboard/chat", icon: <FaComments /> },
   { name: "Dispute", href: "/dashboard/dispute", icon: <FaGavel /> },
 ];
 
@@ -57,6 +60,36 @@ export default function DashboardChildLayout({
   const handleLogout = () => {
     logout();
     router.push("/");
+  };
+
+  const [hasUnread, setHasUnread] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const socketRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!auth?.business) return;
+
+    const socket = initSocket();
+    socketRef.current = socket;
+
+    const roomId = auth.business;
+    console.log("business room " + roomId);
+    const inputx = { type: "business", id: roomId };
+    socket.emit("joinRoom", inputx);
+    //socket.emit("joinRoom", { type: "business", id: auth.business });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    socket.on("newMessage", (data) => {
+      setHasUnread(true);
+    });
+
+    return () => {
+      socket.off("newMessage");
+    };
+  }, [auth?.business]);
+
+  const showChatPage = () => {
+    router.push("/dashboard/chat");
   };
 
   return (
@@ -135,49 +168,60 @@ export default function DashboardChildLayout({
           </div>
 
           {/* Hover Dropdown */}
-          <div
-            className="relative group"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <div className="text-sm text-gray-700 flex items-center gap-2 cursor-pointer hover:text-primary transition">
-              Welcome, {auth?.adminFirstName}
-              <FaUserCircle className="text-lg" />
-            </div>
-
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-52 bg-white shadow-lg border border-gray-200 rounded-lg z-50 overflow-hidden animate-fade-in">
-                <Link
-                  href="/dashboard/profile"
-                  className="flex items-center px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 transition"
-                >
-                  <FaUserCircle className="mr-2 text-primary" />
-                  Profile
-                </Link>
-                <Link
-                  href="/dashboard/admins"
-                  className="flex items-center px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 transition"
-                >
-                  <FaUserCircle className="mr-2 text-primary" />
-                  Admins
-                </Link>
-                <Link
-                  href="/dashboard/change-password"
-                  className="flex items-center px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 transition"
-                >
-                  <FaKey className="mr-2 text-yellow-500" />
-                  Change Password
-                </Link>
-                <Link
-                  href="/"
-                  onClick={handleLogout}
-                  className="w-full text-left flex items-center px-4 py-3 hover:bg-gray-50 text-sm text-red-600 transition"
-                >
-                  <FaSignOutAlt className="mr-2" />
-                  Logout
-                </Link>
+          <div className="flex gap-2">
+            <div
+              className="relative group"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="text-sm text-gray-700 flex items-center gap-2 cursor-pointer hover:text-primary transition">
+                Welcome, {auth?.adminFirstName}
+                <FaUserCircle className="text-lg" />
               </div>
-            )}
+
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-52 bg-white shadow-lg border border-gray-200 rounded-lg z-50 overflow-hidden animate-fade-in">
+                  <Link
+                    href="/dashboard/profile"
+                    className="flex items-center px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 transition"
+                  >
+                    <FaUserCircle className="mr-2 text-primary" />
+                    Profile
+                  </Link>
+                  <Link
+                    href="/dashboard/admins"
+                    className="flex items-center px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 transition"
+                  >
+                    <FaUserCircle className="mr-2 text-primary" />
+                    Admins
+                  </Link>
+                  <Link
+                    href="/dashboard/change-password"
+                    className="flex items-center px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 transition"
+                  >
+                    <FaKey className="mr-2 text-yellow-500" />
+                    Change Password
+                  </Link>
+                  <Link
+                    href="/"
+                    onClick={handleLogout}
+                    className="w-full text-left flex items-center px-4 py-3 hover:bg-gray-50 text-sm text-red-600 transition"
+                  >
+                    <FaSignOutAlt className="mr-2" />
+                    Logout
+                  </Link>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => showChatPage()}
+              className="relative cursor-pointer text-primary text-xl hover:text-primary-dark transition"
+            >
+              <FaComments />
+              {hasUnread && (
+                <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full" />
+              )}
+            </button>
           </div>
         </header>
 
