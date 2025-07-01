@@ -20,6 +20,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 import { initSocket } from "@/utils/socket";
+import Logo from "@/components/shared/Logo";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: <FaTachometerAlt /> },
@@ -97,7 +98,8 @@ export default function DashboardChildLayout({
       {/* Desktop Sidebar */}
       <aside className="w-64 bg-white shadow-md p-5 hidden md:flex flex-col justify-between">
         <div>
-          <h2 className="text-xl font-bold mb-6 text-primary">Naija Escrow</h2>
+         {/*  <h2 className="text-xl font-bold mb-6 text-primary">Naija </h2> */}
+           <Logo />
           <nav className="space-y-2">
             {navItems.map((item) => (
               <Link
@@ -133,7 +135,7 @@ export default function DashboardChildLayout({
         } md:hidden`}
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-primary">Naija Escrow</h2>
+          <Logo />
           <button onClick={toggleSidebar}>
             <FaTimes className="text-gray-600" />
           </button>
