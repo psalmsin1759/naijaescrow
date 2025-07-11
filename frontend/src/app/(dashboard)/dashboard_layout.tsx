@@ -15,6 +15,7 @@ import {
   FaKey,
   FaSignOutAlt,
   FaComments,
+  FaMoneyBillWave
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -33,6 +34,7 @@ const navItems = [
   },
   { name: "Chat", href: "/dashboard/chat", icon: <FaComments /> },
   { name: "Dispute", href: "/dashboard/dispute", icon: <FaGavel /> },
+  { name: "Payout Details", href: "/dashboard/payout-details", icon: <FaMoneyBillWave /> },
 ];
 
 export default function DashboardChildLayout({

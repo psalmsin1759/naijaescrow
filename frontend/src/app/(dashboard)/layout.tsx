@@ -7,6 +7,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import DashboardChildLayout from "./dashboard_layout";
 import { AuthProvider } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { PayoutProvider } from "@/context/PayoutContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,7 +36,9 @@ export default function DashboardLayout({
       >
         <AuthProvider>
           <ProtectedRoute>
-            <DashboardChildLayout>{children}</DashboardChildLayout>
+            <PayoutProvider>
+              <DashboardChildLayout>{children}</DashboardChildLayout>
+            </PayoutProvider>
           </ProtectedRoute>
         </AuthProvider>
       </body>

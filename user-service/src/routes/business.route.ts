@@ -1,7 +1,10 @@
-import express, { Router } from 'express';
-import * as BusinessController from '../controllers/business.controller';
-import { validate } from '../middlewares/validate';
-import { createBusinessSchema, updateBusinessSchema } from '../validators/business.validator';
+import express, { Router } from "express";
+import * as BusinessController from "../controllers/business.controller";
+import { validate } from "../middlewares/validate";
+import {
+  createBusinessSchema,
+  updateBusinessSchema,
+} from "../validators/business.validator";
 
 const businessRouter: Router = express.Router();
 
@@ -28,7 +31,7 @@ const businessRouter: Router = express.Router();
  *                   items:
  *                     $ref: '#/components/schemas/Business'
  */
-businessRouter.get('/', BusinessController.getAllBusinesses);
+businessRouter.get("/", BusinessController.getAllBusinesses);
 
 /**
  * @swagger
@@ -53,7 +56,7 @@ businessRouter.get('/', BusinessController.getAllBusinesses);
  *       404:
  *         description: Business not found
  */
-businessRouter.get('/:id', BusinessController.getBusinessById);
+businessRouter.get("/:id", BusinessController.getBusinessById);
 
 /**
  * @swagger
@@ -77,7 +80,56 @@ businessRouter.get('/:id', BusinessController.getBusinessById);
  *       400:
  *         description: Validation error
  */
-businessRouter.post('/', validate(createBusinessSchema), BusinessController.createBusiness);
+businessRouter.post(
+  "/",
+  validate(createBusinessSchema),
+  BusinessController.createBusiness
+);
+
+/**
+ * @swagger
+ * /verify:
+ *   post:
+ *     summary: Verify a business email using verification code
+ *     description: Confirms a business account using the verification code sent via email.
+ *     tags:
+ *       - Business
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - code
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: business@example.com
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: Business verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Business verified successfully
+ *       400:
+ *         description: Invalid or expired verification code
+ *       404:
+ *         description: Business not found
+ */
+businessRouter.post("/verify", BusinessController.verifyBusiness);
 
 /**
  * @swagger
@@ -108,7 +160,11 @@ businessRouter.post('/', validate(createBusinessSchema), BusinessController.crea
  *       404:
  *         description: Business not found
  */
-businessRouter.put('/:id', validate(updateBusinessSchema), BusinessController.updateBusiness);
+businessRouter.put(
+  "/:id",
+  validate(updateBusinessSchema),
+  BusinessController.updateBusiness
+);
 
 /**
  * @swagger
@@ -129,6 +185,6 @@ businessRouter.put('/:id', validate(updateBusinessSchema), BusinessController.up
  *       404:
  *         description: Business not found
  */
-businessRouter.delete('/:id', BusinessController.deleteBusiness);
+businessRouter.delete("/:id", BusinessController.deleteBusiness);
 
 export default businessRouter;

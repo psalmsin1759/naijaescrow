@@ -17,6 +17,31 @@ export const navItems  = [
     },
 ]
 
+export interface BvnDetail {
+  bvn: string;
+  name: string;
+  phone: string;
+}
+
+export const bvnDetailHolder : BvnDetail [] = [
+   {
+     bvn: "22149543857",
+     name: "Samson Ude",
+     phone: "081005364269"
+   },
+   {
+     bvn: "22149543345",
+     name: "Jeremih Kelvin",
+     phone: "08026428020"
+   },
+   {
+     bvn: "22149543859",
+     name: "Joy Azubuike",
+     phone: "09125094985"
+   },
+
+]
+
 interface TestimonialProps{
    id: number;
     name: string;

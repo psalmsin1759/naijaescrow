@@ -11,6 +11,16 @@ export const createBusiness = async (req: Request, res: Response) => {
   }
 };
 
+export const verifyBusiness = async (req: Request, res: Response) => {
+  try{
+    const {email, code} = req.body;
+    const value = await BusinessService.verifyBusiness(email, code);
+    res.status(201).json(value);
+  } catch (error: any) {
+    res.status(error.status || 500).json({success: false, message: error.message });
+  }
+}
+
 export const getAllBusinesses = async (_: Request, res: Response) => {
   const businesses = await BusinessService.allBusinesses();
   res.json(businesses);

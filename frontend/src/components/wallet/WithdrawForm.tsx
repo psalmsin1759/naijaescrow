@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { debitWallet } from "@/utils/api/Wallet";
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
+import {  usePayoutContext } from "@/context/PayoutContext";
 
 interface Props {
   businessId: string | undefined;
@@ -11,10 +12,11 @@ interface Props {
 }
 
 export default function WithdrawForm({ businessId, closeModal, refresh }: Props) {
-  const [banks] = useState(["Access Bank", "GTBank", "Zenith Bank", "UBA"]);
-  const [selectedBank, setSelectedBank] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [accountName] = useState("Samson Ude");
+
+  const {payouts} = usePayoutContext();
+
+  const [selectedPayout, setSelectedPayout] = useState<string>("")
+  
   const [amount, setAmount] = useState("");
   const [narration, setNarration] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,7 @@ export default function WithdrawForm({ businessId, closeModal, refresh }: Props)
       return;
     }
 
-    if (!amount || !selectedBank || !accountNumber) {
+    if (!amount || !selectedPayout) {
       toast.error("Please fill all required fields");
       return;
     }
@@ -38,7 +40,7 @@ export default function WithdrawForm({ businessId, closeModal, refresh }: Props)
       userId: businessId,
       amount: parseFloat(amount),
       reference: `WD-${Date.now()}`,
-      narration: narration || `Withdrawal to ${selectedBank} - ${accountNumber}`,
+      narration: narration || `Withdrawal to ${selectedPayout} `,
       source: "withdrawal",
       type: "business",
     };
@@ -50,9 +52,7 @@ export default function WithdrawForm({ businessId, closeModal, refresh }: Props)
     if (response.success) {
       toast.success("Withdrawal submitted successfully");
       setAmount("");
-      setAccountNumber("");
       setNarration("");
-      setSelectedBank("");
       closeModal()
       refresh()
     } else {
@@ -73,40 +73,20 @@ export default function WithdrawForm({ businessId, closeModal, refresh }: Props)
         />
 
         <select
-          value={selectedBank}
-          onChange={(e) => setSelectedBank(e.target.value)}
+          value={selectedPayout}
+          onChange={(e) => setSelectedPayout(e.target.value)}
           className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           required
         >
-          <option value="">Select Bank</option>
-          {banks.map((bank) => (
-            <option key={bank} value={bank}>
-              {bank}
+           <option value="">Select Payout Account</option> 
+          {payouts.map((payout, index) => (
+            <option key={index} value={payout.accountNumber}>
+              {payout.accountNumber} -  {payout.bank}
             </option>
           ))}
         </select>
 
-        <input
-          placeholder="Account Number"
-          value={accountNumber}
-          onChange={(e) => setAccountNumber(e.target.value)}
-          className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
-
-        <input
-          value={accountName}
-          readOnly
-          className="w-full p-2 border rounded-md bg-gray-100 text-gray-600"
-          placeholder="Account Name"
-        />
-
-        <textarea
-          placeholder="Description"
-          value={narration}
-          onChange={(e) => setNarration(e.target.value)}
-          className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-        />
+       
 
         <button
           type="submit"

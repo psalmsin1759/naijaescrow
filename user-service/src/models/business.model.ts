@@ -9,6 +9,9 @@ export interface IBusiness extends Document {
   address?: string;
   //admins?: mongoose.Types.ObjectId[]; 
   isActive: boolean;
+  isVerified: boolean;
+  verificationCode?: string;
+  verificationCodeExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,6 +45,16 @@ const BusinessSchema: Schema<IBusiness> = new Schema(
        type: Boolean,
        default: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationCode: {
+      type: String
+    },
+    verificationCodeExpires: {
+      type: Date,
+    }
   },
   {
     timestamps: true,

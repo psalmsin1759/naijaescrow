@@ -12,6 +12,9 @@ import {
 } from "@/utils/api/Wallet";
 import { useAuth } from "@/context/AuthContext";
 import WithdrawForm from "@/components/wallet/WithdrawForm";
+import { usePayoutContext } from "@/context/PayoutContext";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function WalletPage() {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -54,6 +57,18 @@ export default function WalletPage() {
     }).format(new Date(dateStr));
   };
 
+  const { payouts } = usePayoutContext();
+  const router = useRouter();
+
+  const addAction = () => {
+    if (payouts.length === 0) {
+      toast.error("Please add payout details");
+      router.push("/dashboard/payout-details");
+    } else {
+      setShowWithdrawModal(true);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -79,17 +94,15 @@ export default function WalletPage() {
         />
       </div>
 
-     
       <div>
         <button
-          onClick={() => setShowWithdrawModal(true)}
+          onClick={addAction}
           className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-dark transition font-medium shadow"
         >
           Withdraw Funds
         </button>
       </div>
 
-     
       <div className="bg-white rounded-lg shadow p-6 overflow-x-auto">
         <table className="min-w-full text-sm text-gray-700">
           <thead className="bg-gray-100 text-xs uppercase">
@@ -125,7 +138,6 @@ export default function WalletPage() {
         </table>
       </div>
 
-     
       <Modal
         isOpen={showWithdrawModal}
         onClose={closeWithdrawModal}
